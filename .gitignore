@@ -4,4 +4,5 @@ __pycache__/
 # Environments
 .env
 .venv
-./datasets/*
+./datasets/*.csv
+./catboost_info
