@@ -4,4 +4,4 @@ __pycache__/
 # Environments
 .env
 .venv
-./data/*
+./datasets/*

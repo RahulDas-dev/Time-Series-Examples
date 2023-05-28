@@ -49,7 +49,7 @@ def resample_Data(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
 def replace_null(dataframe: pd.DataFrame, method: str = "backfill") -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     if dataframe_.isna().sum().sum() == 0:
-        print(f"No Null Value Found")
+        print("No Null Value Found")
         return dataframe_
     dataframe_.fillna(method=method, inplace=True)
     print(f"replace_null: DF Shape {dataframe_.shape}")
@@ -61,3 +61,68 @@ def drop_indicies(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe_.reset_index(drop=True, inplace=True)
     print(f"drop_indicies: DF Shape {dataframe_.shape}")
     return dataframe_
+
+
+def cast_datetime_column(dataframe: pd.DataFrame):
+    from pandas.errors import ParserError
+
+    dataframe_ = dataframe.copy(deep=True)
+    for c in dataframe_.columns[dataframe_.dtypes == "object"]:
+        try:
+            dataframe_[c] = pd.to_datetime(
+                dataframe_[c], infer_datetime_format=True
+            )  # fixing times
+        except (ParserError, ValueError):
+            try:
+                dataframe_[c] = (
+                    dataframe_[c].str.replace(",", "").astype("float64")
+                )  # fixing numbers
+            except (ParserError, ValueError):
+                pass
+    return dataframe_
+
+
+def findSampleFreq(ts: Union[pd.Series, pd.DatetimeIndex], n: int = None):
+    t_diffs = []
+    n = ts.shape[0] - 1 if n is None else n
+    for i in range(n):
+        td = ts.iloc[i + 1] - ts.iloc[i]
+        t_diffs.append(td)
+
+    avg_diff = np.mean(t_diffs)
+
+    # fixed with https://stackoverflow.com/a/42247228
+    diff_ns = avg_diff.delta
+    diff_us = diff_ns / 1000
+    diff_ms = diff_us / 1000
+    diff_sec = diff_ms / 1000
+    diff_min = diff_sec / 60
+    diff_hour = diff_min / 60
+    diff_biz = (diff_hour / 24) / (7 / 5)  # assert no holidays
+    diff_day = diff_hour / 24
+    diff_wk = diff_day / 7
+    diff_semi = diff_day / 15.21875
+    diff_month = diff_day / 30.4375
+    diff_qtr = diff_day / 91.3125
+    diff_yr = diff_day / 365.25
+
+    # anticipates backward timing dataframes with outer abs
+    eval = {
+        abs(1 - abs(k)): v
+        for k, v in {
+            diff_us: "U",
+            diff_ms: "L",
+            diff_sec: "S",
+            diff_min: "T",
+            diff_hour: "H",
+            diff_biz: "B",
+            diff_day: "D",
+            diff_wk: "W",
+            diff_semi: "SMS",
+            diff_month: "MS",
+            diff_qtr: "QS",
+            diff_yr: "AS",
+        }.items()
+    }
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+    return eval[min(eval)]
