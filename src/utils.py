@@ -77,7 +77,7 @@ def show_series(dataframes: List[pd.Series], labels: Union[List[str], str]):
 
 
 def plot_metrics(dataframe: pd.DataFrame):
-    fig, axis = plt.subplots(nrows=2, ncols=2, figsize=(8, 7))
+    fig, axis = plt.subplots(nrows=2, ncols=2, figsize=(12, 7))
 
     dataframe_ = dataframe.T.copy(deep=True)
 
