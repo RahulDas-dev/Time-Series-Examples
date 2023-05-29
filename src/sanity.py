@@ -17,7 +17,9 @@ def select_column(dataframe: pd.DataFrame, cols: Union[List[str], str]) -> pd.Da
     return dataframe_
 
 
-def format_datetime(dataframe: pd.DataFrame, col: str, format: str) -> pd.DataFrame:
+def format_datetime(
+    dataframe: pd.DataFrame, col: str, format: str = None
+) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_[col] = pd.to_datetime(dataframe[col], format=format)
     print(f"format_datetime: DF Shape {dataframe_.shape}")
@@ -35,13 +37,14 @@ def create_index(dataframe: pd.DataFrame, col: str, format: str) -> pd.DataFrame
 def set_index(dataframe: pd.DataFrame, col: str) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_.set_index(keys=col, inplace=True)
+    dataframe_.sort_index(ascending=True)
     print(f"set_index: DF Shape {dataframe_.shape}")
     return dataframe_
 
 
 def resample_Data(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
-    dataframe_ = dataframe_.resample(freq).last()
+    dataframe_ = dataframe_.resample(freq).mean(numeric_only=True)
     print(f"resample_Data: DF Shape {dataframe_.shape}")
     return dataframe_
 
@@ -60,6 +63,16 @@ def drop_indicies(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_.reset_index(drop=True, inplace=True)
     print(f"drop_indicies: DF Shape {dataframe_.shape}")
+    return dataframe_
+
+
+def interpolate_column(dataframe: pd.DataFrame, cols: str = None) -> pd.DataFrame:
+    dataframe_ = dataframe.copy(deep=True)
+    cols = dataframe_.columns.to_list() if cols is None else cols
+    cols = cols if isinstance(cols, list) else [cols]
+    for col in cols:
+        dataframe_[col] = dataframe_[col].interpolate()
+    print(f"interpolate_columns: DF Shape {dataframe_.shape}")
     return dataframe_
 
 

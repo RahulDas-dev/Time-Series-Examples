@@ -127,3 +127,8 @@ def create_window_feature(
         dataframe_[column_name2] = dataframe_[col].rolling(window=window_len).std()
         dataframe_[column_name2].fillna(method="backfill", inplace=True)
     return dataframe_
+
+
+def cast_to_float(dataframe: pd.DataFrame) -> pd.DataFrame:
+    dataframe_ = dataframe.copy(deep=True)
+    return dataframe_.astype(float)
