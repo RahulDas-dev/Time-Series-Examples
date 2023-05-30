@@ -36,7 +36,7 @@ def create_index(dataframe: pd.DataFrame, col: str, format: str) -> pd.DataFrame
 
 def set_index(dataframe: pd.DataFrame, col: str) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
-    dataframe_.set_index(keys=col, inplace=True)
+    dataframe_.set_index(keys=col, drop=True, inplace=True)
     dataframe_.sort_index(ascending=True)
     print(f"set_index: DF Shape {dataframe_.shape}")
     return dataframe_
@@ -71,9 +71,14 @@ def interpolate_column(dataframe: pd.DataFrame, cols: str = None) -> pd.DataFram
     cols = dataframe_.columns.to_list() if cols is None else cols
     cols = cols if isinstance(cols, list) else [cols]
     for col in cols:
-        dataframe_[col] = dataframe_[col].interpolate()
+        dataframe_[col] = dataframe_[col].interpolate(method='backfill')
     print(f"interpolate_columns: DF Shape {dataframe_.shape}")
     return dataframe_
+
+
+def add_missing_dates(dataframe: pd.DataFrame, freq: str = 'D') -> pd.DataFrame:
+    pass
+
 
 
 def cast_datetime_column(dataframe: pd.DataFrame):
