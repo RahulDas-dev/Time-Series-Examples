@@ -6,7 +6,11 @@ import os
 
 import pandas as pd
 
-from src.dataset_preprocess import pre_process_air_polution_data, pre_process_air_quality_data 
+from src.dataset_preprocess import (
+    process_air_polution_data,
+    process_air_quality_data,
+    process_electricity_data,
+)
 
 
 UCI_URL: str = "https://archive.ics.uci.edu/ml/machine-learning-databases"
@@ -52,7 +56,7 @@ def load_air_quality_data() -> pd.DataFrame:
         dataset_url = f"{UCI_URL}/{dataset_id}/{zipfilename}"
         # print(datset_url, csvPath)
         raw_dataframe = __down_load_zip(dataset_url, csvfilename, ";")
-        dataframe = pre_process_air_quality_data(raw_dataframe)
+        dataframe = process_air_quality_data(raw_dataframe)
         dataframe.to_csv(download_Path, index=False)
     return pd.read_csv(download_Path)
 
@@ -66,7 +70,7 @@ def load_air_polution_data() -> pd.DataFrame:
         dataset_url = f"{UCI_URL}/{dataset_id}/{csvfilename}"
         print(f"dataset_url : {dataset_url}")
         raw_dataframe = __down_load_csv(dataset_url)
-        dataframe = pre_process_air_polution_data(raw_dataframe)
+        dataframe = process_air_polution_data(raw_dataframe)
         dataframe.to_csv(download_Path, index=False)
     return pd.read_csv(download_Path)
 
@@ -83,24 +87,36 @@ def load_climate_change_data() -> pd.DataFrame:
 
 
 def load_power_consumption() -> pd.DataFrame:
-    dataset_id = '00616'
-    csvfilename = 'Tetuan%20City%20power%20consumption.csv'
-    download_Path = os.path.join(DATASET_DIR, csvfilename.replace('%20','_'))
+    dataset_id = "00616"
+    csvfilename = "Tetuan%20City%20power%20consumption.csv"
+    download_Path = os.path.join(DATASET_DIR, csvfilename.replace("%20", "_"))
     dataset_url = f"{UCI_URL}/{dataset_id}/{csvfilename}"
     if os.path.isfile(download_Path) is False:
         raw_dataframe = __down_load_csv(dataset_url)
         raw_dataframe.to_csv(download_Path, index=False)
-    return pd.read_csv(download_Path) 
+    return pd.read_csv(download_Path)
 
 
 def load_traffic_data() -> pd.DataFrame:
-    dataset_id = '00492'
-    csvfilename = 'Metro_Interstate_Traffic_Volume.csv'
-    zipfilename = 'Metro_Interstate_Traffic_Volume.csv.gz'
+    dataset_id = "00492"
+    csvfilename = "Metro_Interstate_Traffic_Volume.csv"
+    zipfilename = "Metro_Interstate_Traffic_Volume.csv.gz"
     download_Path = os.path.join(DATASET_DIR, csvfilename)
     dataset_url = f"{UCI_URL}/{dataset_id}/{zipfilename}"
     if os.path.isfile(download_Path) is False:
         raw_dataframe = __down_load_gzip(dataset_url, csvfilename, ",")
         raw_dataframe.to_csv(download_Path, index=False)
-    return pd.read_csv(download_Path)   
+    return pd.read_csv(download_Path)
 
+
+def load_household_electricity_data() -> pd.DataFrame:
+    dataset_id = "00235"
+    csvfilename = "household_power_consumption.txt"
+    zipfilename = "household_power_consumption.zip"
+    download_Path = os.path.join(DATASET_DIR, csvfilename.replace(".txt", ".csv"))
+    dataset_url = f"{UCI_URL}/{dataset_id}/{zipfilename}"
+    if os.path.isfile(download_Path) is False:
+        raw_dataframe = __down_load_zip(dataset_url, csvfilename, ";")
+        dataframe = process_electricity_data(raw_dataframe)
+        dataframe.to_csv(download_Path, index=False)
+    return pd.read_csv(download_Path)

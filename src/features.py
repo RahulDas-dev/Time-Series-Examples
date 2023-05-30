@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Tuple
 import numpy as np
 import pandas as pd
 
@@ -132,3 +132,18 @@ def create_window_feature(
 def cast_to_float(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     return dataframe_.astype(float)
+
+
+def create_target_vars(
+    dataframe: pd.DataFrame, target_column: str, out_len: int
+) -> Tuple[pd.DataFrame, List[str]]:
+    dataframe_ = dataframe.copy(deep=True)
+    if isinstance(dataframe_.index, pd.DatetimeIndex) is False:
+        return
+    dataframe_.sort_index(ascending=True)
+    target_names = [target_column]
+    for i in range(1, out_len + 1):
+        col_name = f"target_column_{i:02d}"
+        dataframe_[col_name] = dataframe_[target_column].shift(-i)
+        target_names.append(col_name)
+    return dataframe_, target_names

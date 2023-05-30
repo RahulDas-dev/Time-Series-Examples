@@ -7,20 +7,20 @@ import matplotlib.pyplot as plt
 
 __COLORS = [
     "#8A2BE2",
-    "#6495ED",
+    "#FF4500",
+    "#483D8B",
     "#6A5ACD",
     "#663399",
-    "#483D8B",
     "#D2691E",
     "#FF7F50",
     "#DC143C",
-    "#FF4500",
     "#FF6347",
     "#FFD700",
     "#DAA520",
     "#FFA500",
     "#FFFF00",
     "#B8860B",
+    "#6495ED",
 ]
 
 
@@ -62,7 +62,7 @@ def show_dataset(dataframe: pd.DataFrame, columns: Union[str, List] = None):
     plt.subplots_adjust(hspace=0.1)
     for idx, col in enumerate(columns):
         axis_t = axis[idx] if row_n > 1 else axis
-        colors_t = __COLORS[(idx + 6) % len(__COLORS)]  # gROUP OF 6 cOLORS
+        colors_t = __COLORS[idx % len(__COLORS)]  # gROUP OF 6 cOLORS
         axis_t.plot(
             dataframe.index,
             dataframe[col],
@@ -91,7 +91,7 @@ def show_series(dataframes: List[pd.Series], labels: Union[List[str], str]):
 
 
 def plot_metrics(dataframe: pd.DataFrame):
-    fig, axis = plt.subplots(nrows=2, ncols=2, figsize=(12, 7))
+    fig, axis = plt.subplots(nrows=2, ncols=2, figsize=(12, 8))
 
     dataframe_ = dataframe.T.copy(deep=True)
 

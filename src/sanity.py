@@ -71,14 +71,17 @@ def interpolate_column(dataframe: pd.DataFrame, cols: str = None) -> pd.DataFram
     cols = dataframe_.columns.to_list() if cols is None else cols
     cols = cols if isinstance(cols, list) else [cols]
     for col in cols:
-        dataframe_[col] = dataframe_[col].interpolate(method='backfill')
+        dataframe_[col] = dataframe_[col].interpolate(method="backfill")
     print(f"interpolate_columns: DF Shape {dataframe_.shape}")
     return dataframe_
 
 
-def add_missing_dates(dataframe: pd.DataFrame, freq: str = 'D') -> pd.DataFrame:
-    pass
-
+def fill_missing_dates(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
+    ## Data  has be indexed , and freq is original data freq
+    dataframe_ = dataframe.copy(deep=True)
+    dataframe_ = dataframe.resample(freq).sum()
+    print(f"fill_missing_dates: DF Shape {dataframe_.shape}")
+    return dataframe_
 
 
 def cast_datetime_column(dataframe: pd.DataFrame):

@@ -1,8 +1,8 @@
 import pandas as pd
+import numpy as np
 
 
-
-def pre_process_air_quality_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
+def process_air_quality_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
     dataframe = dataframe_.copy(deep=True)
     dataframe.dropna(how="all", axis=1, inplace=True)
     dataframe.dropna(inplace=True)
@@ -37,7 +37,7 @@ def pre_process_air_quality_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
     return dataframe
 
 
-def pre_process_air_polution_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
+def process_air_polution_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
     dataframe_["date"] = dataframe_.apply(
         lambda x: f"{x['year']}-{x['month']}-{x['day']} {x['hour']}:00:00", axis=1
     )
@@ -66,3 +66,20 @@ def pre_process_air_polution_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
     dataframe_ = dataframe_[24:]
     return dataframe_
 
+
+def process_electricity_data(dataframe):
+    dataframe["Date_Time"] = dataframe["Date"] + dataframe["Time"]
+    dataframe["Date_Time"] = pd.to_datetime(
+        dataframe["Date_Time"], format="%d/%m/%Y%H:%M:%S"
+    )
+    dataframe.drop(columns=["Date", "Time"], inplace=True)
+    dataframe.replace("?", np.nan, inplace=True)
+    for col in dataframe.columns:
+        if col == "Date_Time":
+            continue
+        dataframe[col] = dataframe[col].astype(float)
+        dataframe[col] = dataframe[col].interpolate(method="linear")
+
+    columns_list = dataframe.columns.to_list()
+    dataframe = dataframe[columns_list[-1:] + columns_list[:-1]]
+    return dataframe
