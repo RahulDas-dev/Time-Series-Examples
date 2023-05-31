@@ -48,32 +48,32 @@ def create_datetime_feature(
     )
     for feature in features_name:
         if feature == "hour":
-            dataframe_["hour"] = dataframe_.index.hour
+            dataframe_["hour"] = dataframe_.index.hour.astype(float)
         if feature == "dayofweek":
-            dataframe_["dayofweek"] = dataframe_.index.dayofweek
+            dataframe_["dayofweek"] = dataframe_.index.dayofweek.astype(float)
         if feature == "quarter":
-            dataframe_["quarter"] = dataframe_.index.quarter
+            dataframe_["quarter"] = dataframe_.index.quarter.astype(float)
         if feature == "month":
-            dataframe_["month"] = dataframe_.index.month
+            dataframe_["month"] = dataframe_.index.month.astype(float)
         if feature == "year":
-            dataframe_["year"] = dataframe_.index.year
+            dataframe_["year"] = dataframe_.index.year.astype(float)
         if feature == "dayofyear":
-            dataframe_["dayofyear"] = dataframe_.index.dayofyear
+            dataframe_["dayofyear"] = dataframe_.index.dayofyear.astype(float)
         if feature == "dayofmonth":
-            dataframe_["dayofmonth"] = dataframe_.index.day
+            dataframe_["dayofmonth"] = dataframe_.index.day.astype(float)
         if feature == "weekofyear":
-            dataframe_["weekofyear"] = dataframe_.index.isocalendar().week
+            dataframe_["weekofyear"] = dataframe_.index.isocalendar().week.astype(float)
         if feature == "dayofweek":
-            dataframe_["dayofweek"] = dataframe_.index.dayofweek
+            dataframe_["dayofweek"] = dataframe_.index.dayofweek.astype(float)
         if feature == "is_week_end":
             dataframe_["is_week_end"] = dataframe_.index.dayofweek > 4
             dataframe_["is_week_end"] = dataframe_["is_week_end"].apply(
-                lambda x: 1 if x else 0
+                lambda x: 1.0 if x else 0.0
             )
         if feature == "is_week_day":
             dataframe_["is_week_day"] = dataframe_.index.dayofweek < 4
             dataframe_["is_week_day"] = dataframe_["is_week_day"].apply(
-                lambda x: 1 if x else 0
+                lambda x: 1.0 if x else 0.0
             )
     return dataframe_
 
@@ -121,17 +121,20 @@ def create_window_feature(
     column = column if isinstance(column, list) else [column]
     for col in column:
         column_name1 = f"{col}_mean_window_{window_len}"
-        dataframe_[column_name1] = dataframe_[col].rolling(window=window_len).mean()
-        dataframe_[column_name1].fillna(method="backfill", inplace=True)
+        dataframe_[column_name1] = (
+            dataframe_[col].rolling(window=window_len).mean().shift(1)
+        )
         column_name2 = f"{col}_std_window_{window_len}"
-        dataframe_[column_name2] = dataframe_[col].rolling(window=window_len).std()
-        dataframe_[column_name2].fillna(method="backfill", inplace=True)
+        dataframe_[column_name2] = (
+            dataframe_[col].rolling(window=window_len).std().shift(1)
+        )
     return dataframe_
 
 
-def cast_to_float(dataframe: pd.DataFrame) -> pd.DataFrame:
+def drop_null_rows(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
-    return dataframe_.astype(float)
+    dataframe_.dropna(axis=0, inplace=True)
+    return dataframe_
 
 
 def create_target_vars(
