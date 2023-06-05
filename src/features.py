@@ -90,23 +90,24 @@ def create_cyclic_feature(
 
     for feature in features_name:
         if feature == "hour":
-            dataframe_["sin_hour"] = np.sin(dataframe_.index.hour)
-            dataframe_["cos_hour"] = np.cos(dataframe_.index.hour)
+            dataframe_["sin_hour"] = np.sin(2 * np.pi * dataframe_.index.hour / 24)
+            dataframe_["cos_hour"] = np.cos(2 * np.pi * dataframe_.index.hour / 24)
         if feature == "day":
-            dataframe_["sin_day"] = np.sin(dataframe_.index.day)
-            dataframe_["cos_day"] = np.cos(dataframe_.index.day)
+            dataframe_["sin_day"] = np.sin(dataframe_.index.day / dataframe_.index.daysinmonth)
+            dataframe_["cos_day"] = np.cos(dataframe_.index.day / dataframe_.index.daysinmonth)
         if feature == "week":
-            dataframe_["sin_week"] = np.sin(dataframe_.index.dayofweek)
-            dataframe_["cos_week"] = np.cos(dataframe_.index.dayofweek)
+            dataframe_["sin_week"] = np.sin(dataframe_.index.dayofweek / 7)
+            dataframe_["cos_week"] = np.cos(dataframe_.index.dayofweek / 7)
         if feature == "month":
-            dataframe_["sin_month"] = np.sin(dataframe_.index.month)
-            dataframe_["cos_month"] = np.cos(dataframe_.index.month)
+            dataframe_["sin_month"] = np.sin(dataframe_.index.month / 12)
+            dataframe_["cos_month"] = np.cos(dataframe_.index.month / 12)
         if feature == "quarter":
-            dataframe_["sin_quarter"] = np.sin(dataframe_.index.quarter)
-            dataframe_["cos_quarter"] = np.cos(dataframe_.index.quarter)
+            dataframe_["sin_quarter"] = np.sin(dataframe_.index.quarter / 4)
+            dataframe_["cos_quarter"] = np.cos(dataframe_.index.quarter / 4)
         if feature == "year":
-            dataframe_["sin_year"] = np.sin(dataframe_.index.dayofyear)
-            dataframe_["cos_year"] = np.cos(dataframe_.index.dayofyear)
+            dataframe_["sin_year"] = np.sin(dataframe_.index.dayofyear / 365)
+            dataframe_["cos_year"] = np.cos(dataframe_.index.dayofyear / 365)
+    return dataframe_
     return dataframe_
 
 
