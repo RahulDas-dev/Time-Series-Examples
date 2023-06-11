@@ -42,7 +42,7 @@ def set_index(dataframe: pd.DataFrame, col: str) -> pd.DataFrame:
     return dataframe_
 
 
-def resample_Data(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
+def resample_data(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_ = dataframe_.resample(freq).mean(numeric_only=True)
     print(f"resample_Data: DF Shape {dataframe_.shape}")
@@ -68,16 +68,20 @@ def drop_indicies(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 def interpolate_column(dataframe: pd.DataFrame, cols: str = None) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
+    if dataframe.isna().sum().sum() == 0:
+        return dataframe_
     cols = dataframe_.columns.to_list() if cols is None else cols
     cols = cols if isinstance(cols, list) else [cols]
     for col in cols:
+        if dataframe_[col].isna().sum().sum() == 0:
+            continue
         dataframe_[col] = dataframe_[col].interpolate(method="backfill")
     print(f"interpolate_columns: DF Shape {dataframe_.shape}")
     return dataframe_
 
 
 def fill_missing_dates(dataframe: pd.DataFrame, freq: str = "D") -> pd.DataFrame:
-    ## Data  has be indexed , and freq is original data freq
+    # Data has to be indexed , and freq is original data freq
     dataframe_ = dataframe.copy(deep=True)
     dataframe_ = dataframe.resample(freq).sum()
     print(f"fill_missing_dates: DF Shape {dataframe_.shape}")
@@ -103,47 +107,22 @@ def cast_datetime_column(dataframe: pd.DataFrame):
     return dataframe_
 
 
-def findSampleFreq(ts: Union[pd.Series, pd.DatetimeIndex], n: int = None):
-    t_diffs = []
-    n = ts.shape[0] - 1 if n is None else n
-    for i in range(n):
-        td = ts.iloc[i + 1] - ts.iloc[i]
-        t_diffs.append(td)
+def put_target_columns_to_end(dataframe: pd.DataFrame, col: str) -> pd.DataFrame:
+    dataframe_ = dataframe.copy(deep=True)
+    other_cols = set(dataframe_.columns.tolist()) - set([col])
+    rearranged_col = list(other_cols) + [col]
+    dataframe_ = dataframe_[rearranged_col]
+    return dataframe_
 
-    avg_diff = np.mean(t_diffs)
 
-    # fixed with https://stackoverflow.com/a/42247228
-    diff_ns = avg_diff.delta
-    diff_us = diff_ns / 1000
-    diff_ms = diff_us / 1000
-    diff_sec = diff_ms / 1000
-    diff_min = diff_sec / 60
-    diff_hour = diff_min / 60
-    diff_biz = (diff_hour / 24) / (7 / 5)  # assert no holidays
-    diff_day = diff_hour / 24
-    diff_wk = diff_day / 7
-    diff_semi = diff_day / 15.21875
-    diff_month = diff_day / 30.4375
-    diff_qtr = diff_day / 91.3125
-    diff_yr = diff_day / 365.25
+def remove_space_from_columns_name(dataframe: pd.DataFrame) -> pd.DataFrame:
+    dataframe_ = dataframe.copy(deep=True)
+    new_columns = {col: str(col).strip() for col in dataframe_.columns.tolist()}
+    dataframe_.rename(columns=new_columns, inplace=True)
+    return dataframe_
 
-    # anticipates backward timing dataframes with outer abs
-    eval = {
-        abs(1 - abs(k)): v
-        for k, v in {
-            diff_us: "U",
-            diff_ms: "L",
-            diff_sec: "S",
-            diff_min: "T",
-            diff_hour: "H",
-            diff_biz: "B",
-            diff_day: "D",
-            diff_wk: "W",
-            diff_semi: "SMS",
-            diff_month: "MS",
-            diff_qtr: "QS",
-            diff_yr: "AS",
-        }.items()
-    }
-    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
-    return eval[min(eval)]
+
+def rename_column(dataframe: pd.DataFrame, col: str, new_column: str) -> pd.DataFrame:
+    dataframe_ = dataframe.copy(deep=True)
+    dataframe_.rename(columns={col: new_column}, inplace=True)
+    return dataframe_

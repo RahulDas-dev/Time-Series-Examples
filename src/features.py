@@ -93,8 +93,12 @@ def create_cyclic_feature(
             dataframe_["sin_hour"] = np.sin(2 * np.pi * dataframe_.index.hour / 24)
             dataframe_["cos_hour"] = np.cos(2 * np.pi * dataframe_.index.hour / 24)
         if feature == "day":
-            dataframe_["sin_day"] = np.sin(dataframe_.index.day / dataframe_.index.daysinmonth)
-            dataframe_["cos_day"] = np.cos(dataframe_.index.day / dataframe_.index.daysinmonth)
+            dataframe_["sin_day"] = np.sin(
+                dataframe_.index.day / dataframe_.index.daysinmonth
+            )
+            dataframe_["cos_day"] = np.cos(
+                dataframe_.index.day / dataframe_.index.daysinmonth
+            )
         if feature == "week":
             dataframe_["sin_week"] = np.sin(dataframe_.index.dayofweek / 7)
             dataframe_["cos_week"] = np.cos(dataframe_.index.dayofweek / 7)
