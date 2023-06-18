@@ -26,7 +26,7 @@ def format_datetime(
     return dataframe_
 
 
-def create_index(dataframe: pd.DataFrame, col: str, format: str) -> pd.DataFrame:
+def create_index(dataframe: pd.DataFrame, col: str, format: str = None) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_["Index"] = pd.to_datetime(dataframe_.pop(col), format=format)
     dataframe_.set_index(keys="Index", inplace=True)
