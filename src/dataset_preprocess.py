@@ -38,16 +38,16 @@ def process_air_quality_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_air_polution_data(dataframe_: pd.DataFrame) -> pd.DataFrame:
-    dataframe_["date"] = dataframe_.apply(
+    dataframe_["Date_Time"] = dataframe_.apply(
         lambda x: f"{x['year']}-{x['month']}-{x['day']} {x['hour']}:00:00", axis=1
     )
 
-    dataframe_["date"] = pd.to_datetime(
-        dataframe_.pop("date"), format="%Y-%m-%d %H:%M:%S"
+    dataframe_["Date_Time"] = pd.to_datetime(
+        dataframe_.pop("Date_Time"), format="%Y-%m-%d %H:%M:%S"
     )
 
     dataframe_ = dataframe_[
-        ["date", "pm2.5", "DEWP", "TEMP", "PRES", "cbwd", "Iws", "Is", "Ir"]
+        ["Date_Time", "pm2.5", "DEWP", "TEMP", "PRES", "cbwd", "Iws", "Is", "Ir"]
     ].copy(deep=True)
 
     dataframe_.rename(
