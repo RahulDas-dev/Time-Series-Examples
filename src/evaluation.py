@@ -2,10 +2,10 @@ from typing import List
 
 import numpy as np
 from sklearn.metrics import (
-    r2_score,
     mean_absolute_error,
-    mean_squared_error,
     mean_absolute_percentage_error,
+    mean_squared_error,
+    r2_score,
 )
 
 __EPSILON = 1e-10

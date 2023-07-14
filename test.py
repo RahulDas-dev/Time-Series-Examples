@@ -1,11 +1,10 @@
 import logging
 
-from src.ts_stat import SeriesStat, ExtractStats
-from src.load_datasets import load_power_consumption, load_household_electricity_data
-from src.sanity import create_index, resample_data
-
 from sktime.utils import plotting
 
+from src.load_datasets import load_household_electricity_data, load_power_consumption
+from src.sanity import create_index, resample_data
+from src.ts_stat import ExtractStats, SeriesStat
 
 logging.basicConfig(level=logging.INFO)
 

@@ -1,9 +1,8 @@
 from typing import List, Union
 
-import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 __COLORS = [
     "#8A2BE2",

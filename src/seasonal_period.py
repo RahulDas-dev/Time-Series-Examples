@@ -1,6 +1,6 @@
+import re
 from enum import IntEnum
 from math import gcd
-import re
 
 
 class SeasonalPeriod(IntEnum):
