@@ -19,7 +19,7 @@ def select_column(dataframe: pd.DataFrame, cols: Union[List[str], str]) -> pd.Da
 
 
 def format_datetime(
-    dataframe: pd.DataFrame, col: str, format: str = None
+    dataframe: pd.DataFrame, col: str, format: str = "mixed"
 ) -> pd.DataFrame:
     dataframe_ = dataframe.copy(deep=True)
     dataframe_[col] = pd.to_datetime(dataframe[col], format=format)
