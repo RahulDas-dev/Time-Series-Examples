@@ -3,17 +3,14 @@ from typing import List, Optional, Type, Union
 from automl.basemodel import BaseModel, ModelID, ModelType
 from automl.models.elasticnet import ElasticNetModel
 from automl.models.linearmodel import LinearModel
-from automl.ts_stat import SeriesStat
-
-model_list = [
-    LinearModel,
-    ElasticNetModel,
-]
+from automl.models.lasso import LassoModel
+from automl.stat.statistics import SeriesStat
 
 
 class ModelQuery:
     _model_list = [
         LinearModel,
+        LassoModel,
         ElasticNetModel,
     ]
 

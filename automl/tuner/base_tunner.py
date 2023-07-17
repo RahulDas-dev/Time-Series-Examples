@@ -2,24 +2,31 @@ import numpy as np
 import pandas as pd
 from sktime.forecasting.model_selection import ExpandingWindowSplitter
 from sktime.performance_metrics.forecasting import (
-    MeanAbsoluteError, MeanAbsolutePercentageError, MeanAbsoluteScaledError,
-    MeanSquaredError)
+    MeanAbsoluteError,
+    MeanAbsolutePercentageError,
+    MeanAbsoluteScaledError,
+    MeanSquaredError,
+)
 
 
 class BaseTunner:
-    def __init__(
-        self,
-        y: pd.Series,
-        fh: int,
-        x: pd.DataFrame = None,
-        cv_split: int = 5,
-        score: str = "mae",
-    ):
-        self.y = y
-        self.x = x
-        self.fh = np.arange(1, fh + 1)
+    def __init__(self, model_select_count: int, cv_split: int, metric: str):
+        self.model_select_count = model_select_count
         self.cv_split = cv_split
-        self.score = score
+        self.metric = metric
+        self.y, self.x, self.fh = None, None, None
+
+    def set_y(self, y: pd.Series):
+        self.y = y
+        return self
+
+    def set_x(self, x: pd.DataFrame):
+        self.x = x
+        return self
+
+    def set_fh(self, fh: int):
+        self.fh = np.arange(1, fh + 1)
+        return self
 
     def get_crossvalidate_spliter(self):
         y_size = len(self.y)
@@ -34,17 +41,17 @@ class BaseTunner:
         return cv
 
     def get_scoring_metric(self):
-        if self.score == "mae":
+        if self.metric == "mae":
             return MeanAbsoluteError()
-        elif self.score == "rmse":
+        elif self.metric == "rmse":
             return MeanSquaredError(square_root=True)
-        elif self.score == "mse":
+        elif self.metric == "mse":
             return MeanSquaredError(square_root=False)
-        elif self.score == "mape":
+        elif self.metric == "mape":
             return MeanAbsolutePercentageError(symmetric=False)
-        elif self.score == "smape":
+        elif self.metric == "smape":
             return MeanAbsolutePercentageError(symmetric=True)
-        elif self.score == "mase":
+        elif self.metric == "mase":
             return MeanAbsoluteScaledError()
         else:
             return MeanAbsoluteError()

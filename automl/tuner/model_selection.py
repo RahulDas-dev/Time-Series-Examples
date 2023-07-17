@@ -1,42 +1,37 @@
 import logging
+from typing import List
 
-import pandas as pd
 from sktime.forecasting.model_selection import ForecastingGridSearchCV
 
-from automl.base_tunner import BaseTunner
-from automl.basemodel import BaseModel
-from automl.model_query import ModelQuery
-from automl.models.elasticnet import ElasticNetModel
-from automl.models.linearmodel import LinearModel
-from automl.ts_stat import SeriesStat
+from automl.tuner.base_tunner import BaseTunner
+from automl.ml_model import MLModel
+from automl.basemodel import ModelID
+from automl.model_db import ModelQuery
+from automl.stat.statistics import SeriesStat
 
 logger = logging.getLogger(__name__)
 
-model_list = [
-    LinearModel,
-    ElasticNetModel,
-]
-
 
 class ModelSelector(BaseTunner):
-    def __init__(
-        self,
-        y: pd.Series,
-        fh: int,
-        x: pd.DataFrame = None,
-        cv_split: int = 5,
-        score: str = "mae",
-    ):
-        super().__init__(y, fh, x, cv_split, score)
+    def __init__(self, model_select_count: int, cv_split: int, metric: str, **kwargs):
+        super().__init__(model_select_count, cv_split, metric)
+        self.y, self.x, self.fh = None, None, None
 
-    def select_models(self, stat: SeriesStat):
+    def select_models(self, stat: SeriesStat) -> List[ModelID]:
         models_list = ModelQuery.find_all_model_object(stat)
+        if len(models_list) <= self.model_select_count:
+            logger.info("Skipping Model Selection ")
+            return [type(model).identifier for model in models_list]
+
         param_grid = {
             "forecaster__reducer__estimator": [
                 model.get_regressors() for model in models_list
             ]
         }
-        pipeline = BaseModel(stat).forecasting_pipeline.clone()
+        pipeline = MLModel(stat).forecasting_pipeline.clone()
+
+        logger.info(self.get_crossvalidate_spliter())
+
         grid_search = ForecastingGridSearchCV(
             pipeline,
             strategy="refit",
@@ -45,13 +40,13 @@ class ModelSelector(BaseTunner):
             param_grid=param_grid,
             verbose=10,
             n_jobs=-1,
-            refit=True,
+            refit=False,
             error_score="raise",
-            return_n_best_forecasters=1,
+            return_n_best_forecasters=self.model_select_count,
         )
         grid_search.fit(self.y, X=self.x, fh=self.fh)
-        logger.info("Best Params", grid_search.best_params_)
-        logger.info("Best scores", grid_search.best_score_)
+        logger.info(f"Best Params {grid_search.best_params_}")
+        logger.info(f"Best scores {grid_search.best_score_}")
         regressors = grid_search.best_params_["forecaster__reducer__estimator"]
 
         if isinstance(regressors, list) is False:

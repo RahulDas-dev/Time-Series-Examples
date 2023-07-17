@@ -2,8 +2,7 @@ import logging
 
 from sktime.utils import plotting
 
-from src.load_datasets import (load_household_electricity_data,
-                               load_power_consumption)
+from src.load_datasets import load_household_electricity_data, load_power_consumption
 from src.sanity import create_index, resample_data
 from src.ts_stat import ExtractStats, SeriesStat
 
