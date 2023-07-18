@@ -1,6 +1,9 @@
 numpy
 scipy
 pandas
+matplotlib
+scikit-learn
 sktime
+seaborn
 statsmodels
 scikit-learn-intelex

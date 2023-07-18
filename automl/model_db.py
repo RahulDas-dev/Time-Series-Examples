@@ -1,9 +1,11 @@
 from typing import List, Optional, Type, Union
 
-from automl.basemodel import BaseModel, ModelID, ModelType
-from automl.models.elasticnet import ElasticNetModel
-from automl.models.linearmodel import LinearModel
-from automl.models.lasso import LassoModel
+from automl.models.basemodel import BaseModel, ModelID, ModelType
+from automl.models.ml_models.elasticnet import ElasticNetModel
+from automl.models.ml_models.linearmodel import LinearModel
+from automl.models.ml_models.lasso import LassoModel
+from automl.models.ml_models.lassolars import LassoLarsModel
+from automl.models.ml_models.ridge import RidgeModel
 from automl.stat.statistics import SeriesStat
 
 
@@ -11,7 +13,9 @@ class ModelQuery:
     _model_list = [
         LinearModel,
         LassoModel,
+        LassoLarsModel,
         ElasticNetModel,
+        RidgeModel,
     ]
 
     @classmethod

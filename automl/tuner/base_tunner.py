@@ -53,5 +53,12 @@ class BaseTunner:
             return MeanAbsolutePercentageError(symmetric=True)
         elif self.metric == "mase":
             return MeanAbsoluteScaledError()
+        elif self.metric == "all":
+            return [MeanAbsoluteError(),
+                    MeanSquaredError(square_root=True),
+                    MeanSquaredError(square_root=False),
+                    MeanAbsolutePercentageError(symmetric=False),
+                    MeanAbsolutePercentageError(symmetric=True),
+                    MeanAbsoluteScaledError()]
         else:
             return MeanAbsoluteError()

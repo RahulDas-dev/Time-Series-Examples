@@ -13,11 +13,12 @@ class ModelType(IntEnum):
 class ModelID(IntEnum):
     LinearModelCCD = 1
     LassoCCD = 2
-    ElasticnetCCD = 3
+    LassoLarsCCD = 3
+    RidgeCCD = 4
+    ElasticnetCCD = 6
 
 
 class BaseModel:
-
     @classmethod
     @property
     def description(cls) -> str:

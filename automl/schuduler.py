@@ -34,7 +34,7 @@ class Schuduler:
         return self
 
     def extract_statistics(self):
-        logger.info('Extracting Statistics ...')
+        logger.info("Extracting Statistics ...")
         self.statistics = ExtractStats(frequency=self.frequency).extract_statistics(
             self.y
         )
@@ -42,7 +42,7 @@ class Schuduler:
         return self
 
     def select_model(self):
-        logger.info('Selecting Models from ...')
+        logger.info("Selecting Models from ...")
         self.model_ids = (
             ModelSelector(**vars(self.settings))
             .set_y(self.y)
@@ -53,7 +53,7 @@ class Schuduler:
         return self
 
     def tune_models(self):
-        logger.info('Tunning Selected Models ...')
+        logger.info("Tunning Selected Models ...")
         self.tuned_model = (
             ModelTuner(**vars(self.settings))
             .set_y(self.y)

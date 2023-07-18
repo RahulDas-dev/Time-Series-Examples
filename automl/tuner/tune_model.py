@@ -4,7 +4,7 @@ from typing import List, Tuple
 from sktime.forecasting.model_selection import ForecastingRandomizedSearchCV
 
 from automl.tuner.base_tunner import BaseTunner
-from automl.basemodel import ModelID
+from automl.models.basemodel import ModelID
 from automl.model_db import ModelQuery
 from automl.stat.statistics import SeriesStat
 

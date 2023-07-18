@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 def get_air_polution_data():
@@ -61,7 +61,7 @@ def get_traffiC_data():
 
 if __name__ == "__main__":
     # y, x = get_air_polution_data()
-    
+
     y, x = get_traffiC_data()
     fh = 15
     settings = {

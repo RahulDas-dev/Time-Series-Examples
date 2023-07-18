@@ -14,7 +14,7 @@ Deep learning Library
 
 for pipeline implementation see
 
-1. [blogs2](https://ploomber.io/blog/sklearn-custom/)
+1. [blogs1](https://ploomber.io/blog/sklearn-custom/)
 2. [blogs2](https://www.andrewvillazon.com/custom-scikit-learn-transformers/)
 3. https://learn-scikit.oneoffcoder.com/customized-estimators.htmls
 4. https://gitlab.com/thibaultB/transformers
