@@ -6,11 +6,9 @@ from zipfile import ZipFile
 
 import pandas as pd
 
-from src.dataset_preprocess import (
-    process_air_polution_data,
-    process_air_quality_data,
-    process_electricity_data,
-)
+from src.dataset_preprocess import (process_air_polution_data,
+                                    process_air_quality_data,
+                                    process_electricity_data)
 
 UCI_URL: str = "https://archive.ics.uci.edu/ml/machine-learning-databases"
 CURRENT_DIR: str = os.path.dirname(os.path.realpath(__file__))

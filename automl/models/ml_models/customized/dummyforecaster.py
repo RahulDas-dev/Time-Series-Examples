@@ -1,5 +1,5 @@
-from sktime.forecasting.base import BaseForecaster
 import pandas as pd
+from sktime.forecasting.base import BaseForecaster
 
 
 class DummyForecaster(BaseForecaster):

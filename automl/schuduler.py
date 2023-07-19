@@ -1,14 +1,14 @@
 import logging
 import os
-from typing import Dict, Any
+from typing import Any, Dict
 
-import pandas as pd
 import joblib
+import pandas as pd
 
-from automl.tuner.model_selection import ModelSelector
-from automl.stat.statistics import ExtractStats
-from automl.tuner.tune_model import ModelTuner
 from automl.settings import Settings
+from automl.stat.statistics import ExtractStats
+from automl.tuner.model_selection import ModelSelector
+from automl.tuner.tune_model import ModelTuner
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class Schuduler:
     def __init__(self, settings: Dict[str, Any]):
         self.settings = Settings(**settings)
+        self.y, self.x, self.fh = None, None, None
 
     def set_y(self, y: pd.Series):
         self.y = y
@@ -35,21 +36,23 @@ class Schuduler:
 
     def extract_statistics(self):
         logger.info("Extracting Statistics ...")
-        self.statistics = ExtractStats(frequency=self.frequency).extract_statistics(
-            self.y
-        )
+        has_exogenous = True if self.x is not None else False
+        self.statistics = ExtractStats(
+            self.frequency, has_exogenous
+        ).extract_statistics(self.y)
         logger.info(self.statistics)
         return self
 
     def select_model(self):
-        logger.info("Selecting Models from ...")
-        self.model_ids = (
+        logger.info("Selecting Models from ...\n")
+        self.model_ids, result = (
             ModelSelector(**vars(self.settings))
             .set_y(self.y)
             .set_x(self.x)
             .set_fh(self.fh)
             .select_models(self.statistics)
         )
+        print(result)
         return self
 
     def tune_models(self):

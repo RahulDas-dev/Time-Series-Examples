@@ -4,13 +4,8 @@ import warnings
 
 from automl.schuduler import Schuduler
 from src.load_datasets import load_air_polution_data, load_traffic_data
-from src.sanity import (
-    format_datetime,
-    interpolate_column,
-    resample_data,
-    select_column,
-    set_index,
-)
+from src.sanity import (format_datetime, interpolate_column, resample_data,
+                        select_column, set_index)
 
 logging.basicConfig(level=logging.INFO)
 

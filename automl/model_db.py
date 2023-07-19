@@ -1,21 +1,27 @@
 from typing import List, Optional, Type, Union
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
-from automl.models.ml_models.elasticnet import ElasticNetModel
-from automl.models.ml_models.linearmodel import LinearModel
-from automl.models.ml_models.lasso import LassoModel
-from automl.models.ml_models.lassolars import LassoLarsModel
-from automl.models.ml_models.ridge import RidgeModel
+from automl.models.ml_models.elasticnet import ElasticNetCCD, ElasticNetModel
+from automl.models.ml_models.lasso import LassoCCD, LassoModel
+from automl.models.ml_models.lassolars import LassoLarsModel, LassoLarsCCD
+from automl.models.ml_models.linearmodel import (LinearModelCCD,
+                                                 LinearModel)
+from automl.models.ml_models.ridge import RidgeModel, RidgeCCD
 from automl.stat.statistics import SeriesStat
 
 
 class ModelQuery:
     _model_list = [
         LinearModel,
+        LinearModelCCD,
         LassoModel,
+        LassoCCD,
         LassoLarsModel,
+        LassoLarsCCD,
         ElasticNetModel,
+        ElasticNetCCD,
         RidgeModel,
+        RidgeCCD,
     ]
 
     @classmethod

@@ -3,10 +3,10 @@ from typing import List, Tuple
 
 from sktime.forecasting.model_selection import ForecastingRandomizedSearchCV
 
-from automl.tuner.base_tunner import BaseTunner
-from automl.models.basemodel import ModelID
 from automl.model_db import ModelQuery
+from automl.models.basemodel import ModelID
 from automl.stat.statistics import SeriesStat
+from automl.tuner.base_tunner import BaseTunner
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class ModelTuner(BaseTunner):
             logger.info(f"Tunning Model {type(pipeline).identifier}")
 
             grid_search = ForecastingRandomizedSearchCV(
-                pipeline.model,
+                pipeline.forecaster,
                 strategy="refit",
                 scoring=self.get_scoring_metric(),
                 cv=self.get_crossvalidate_spliter(),

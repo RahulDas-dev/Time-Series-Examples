@@ -11,11 +11,16 @@ class ModelType(IntEnum):
 
 @unique
 class ModelID(IntEnum):
-    LinearModelCCD = 1
-    LassoCCD = 2
-    LassoLarsCCD = 3
-    RidgeCCD = 4
-    ElasticnetCCD = 6
+    Linear = 1
+    LinearCCD = 2
+    Lasso = 3
+    LassoCCD = 4
+    LassoLars = 5
+    LassoLarsCCD = 6
+    Ridge = 7
+    RidgeCCD = 8
+    Elasticnet = 9
+    ElasticnetCCD = 10
 
 
 class BaseModel:

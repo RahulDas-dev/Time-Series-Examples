@@ -7,7 +7,8 @@ import pandas as pd
 from pmdarima.arima.utils import ndiffs, nsdiffs
 from sktime.param_est.seasonality import SeasonalityACF
 from sktime.transformations.series.difference import Differencer
-from sktime.utils.seasonality import autocorrelation_seasonality_test as acf_sp_test
+from sktime.utils.seasonality import \
+    autocorrelation_seasonality_test as acf_sp_test
 from statsmodels.tsa.seasonal import seasonal_decompose
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ class SeriesStat:
     all_sps_to_use: List[int]
     lower_d: int
     uppercase_d: int
+    has_exogenous_data: bool
 
     def __repr__(self):
         fields = "\n\t".join(
@@ -45,7 +47,7 @@ class ExtractStats:
     NO_SP_2_USE: int = 1
     SP_DETECTION_ALGO: str = "AUTO"  # 'INDEX'
 
-    def __init__(self, frequency: str):
+    def __init__(self, frequency: str, has_exogen_data: bool = False):
         self.__frequency = frequency
         self.__is_strickly_positive = False
         self.__is_white_noise = False
@@ -57,6 +59,7 @@ class ExtractStats:
         self.__all_sps_to_use = []
         self.__lowercase_d = 0
         self.__uppercase_d = 0
+        self.__has_exogenous_data = has_exogen_data
 
     def extract_statistics(self, data: Union[np.ndarray, pd.Series]) -> SeriesStat:
         data_ = data.copy(deep=True)
@@ -79,6 +82,7 @@ class ExtractStats:
             self.__all_sps_to_use,
             self.__lowercase_d,
             self.__uppercase_d,
+            self.__has_exogenous_data,
         )
 
     def detect_is_strickly_positive(self, data: Union[np.ndarray, pd.Series]):

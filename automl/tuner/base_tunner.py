@@ -2,11 +2,8 @@ import numpy as np
 import pandas as pd
 from sktime.forecasting.model_selection import ExpandingWindowSplitter
 from sktime.performance_metrics.forecasting import (
-    MeanAbsoluteError,
-    MeanAbsolutePercentageError,
-    MeanAbsoluteScaledError,
-    MeanSquaredError,
-)
+    MeanAbsoluteError, MeanAbsolutePercentageError, MeanAbsoluteScaledError,
+    MeanSquaredError)
 
 
 class BaseTunner:
@@ -53,12 +50,13 @@ class BaseTunner:
             return MeanAbsolutePercentageError(symmetric=True)
         elif self.metric == "mase":
             return MeanAbsoluteScaledError()
-        elif self.metric == "all":
-            return [MeanAbsoluteError(),
-                    MeanSquaredError(square_root=True),
-                    MeanSquaredError(square_root=False),
-                    MeanAbsolutePercentageError(symmetric=False),
-                    MeanAbsolutePercentageError(symmetric=True),
-                    MeanAbsoluteScaledError()]
         else:
             return MeanAbsoluteError()
+
+    def get_all_scoring_matric(self):
+        return [
+            MeanAbsoluteError(),
+            MeanSquaredError(square_root=True),
+            MeanAbsolutePercentageError(symmetric=False),
+            MeanAbsoluteScaledError(),
+        ]
