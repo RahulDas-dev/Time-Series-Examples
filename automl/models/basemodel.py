@@ -21,6 +21,20 @@ class ModelID(IntEnum):
     RidgeCCD = 8
     Elasticnet = 9
     ElasticnetCCD = 10
+    BayesianRidge = 11
+    BayesianRidgeCCD = 12
+    HuberRegressor = 13
+    HuberRegressorCCD = 14
+    KNeighborsRegressor = 15
+    KNeighborsRegressorCCD = 16
+    DecisionTree = 20
+    DecisionTreeCCD = 21
+    RandomForest = 22
+    RandomForestCCD = 23
+    XGBoost = 24
+    XGBoostCCD = 25
+    LightGBM = 26
+    LightGBMCCD = 27
 
 
 class BaseModel:

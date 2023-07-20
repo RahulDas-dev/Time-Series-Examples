@@ -67,6 +67,7 @@ if __name__ == "__main__":
     }
     app = (
         Schuduler(settings)
+        .set_exp_id("exp_123")
         .set_y(y)
         .set_x(x)
         .set_fh(fh)

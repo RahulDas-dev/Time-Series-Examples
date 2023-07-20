@@ -5,20 +5,9 @@ from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class Ridge:
-    def get_regressors(self):
-        try:
-            from sklearnex.linear_model import Ridge
-        except ImportError:
-            from sklearn.linear_model import Ridge
-        regressor = Ridge()
-        regressor_args = self.find_regressor_config(regressor)
-        return Ridge(**regressor_args)
-
-
-class RidgeModel(MLPipelineSimple, BaseModel, Ridge):
-    _identifier: str = ModelID.Ridge
-    _description: str = "Ridge Model"
+class BayesianRidgeModel(MLPipelineSimple, BaseModel):
+    _identifier: str = ModelID.BayesianRidge
+    _description: str = "Bayesian Ridge Regression"
     _mtype: ModelType = ModelType.ML_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -30,21 +19,33 @@ class RidgeModel(MLPipelineSimple, BaseModel, Ridge):
             param_grid = {
                 "scaler_x__passthrough": [True, False],
                 "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha": uniform(0.001, 10),
+                "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
+                "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
+                "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
+                "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
                 "forecaster__reducer__estimator__fit_intercept": [True, False],
             }
         else:
             param_grid = {
                 "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha": uniform(0.001, 10),
+                "reducer__estimator__alpha_1": uniform(0, 1),
+                "reducer__estimator__alpha_2": uniform(0, 1),
+                "reducer__estimator__lambda_1": uniform(0, 1),
+                "reducer__estimator__lambda_2": uniform(0, 1),
                 "reducer__estimator__fit_intercept": [True, False],
             }
         return param_grid
 
+    def get_regressors(self):
+        from sklearn.linear_model import BayesianRidge
 
-class RidgeCCD(MLPipelineCCD, BaseModel, Ridge):
-    _identifier: str = ModelID.RidgeCCD
-    _description: str = "Ridge Model Conditional Deseasonalizer Detrender"
+        regressor_args = self.find_regressor_config(BayesianRidge())
+        return BayesianRidge(**regressor_args)
+
+
+class BayesianRidgeCCD(MLPipelineCCD, BaseModel):
+    _identifier: str = ModelID.BayesianRidgeCCD
+    _description: str = "Bayesian Ridge Regression Conditional Deseasonalizer Detrender"
     _mtype: ModelType = ModelType.ML_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -59,19 +60,27 @@ class RidgeCCD(MLPipelineCCD, BaseModel, Ridge):
             param_grid = {
                 "scaler_x__passthrough": [True, False],
                 "forecaster__deseasonalizer__model": deseasonal_type,
-                "forecaster__deseasonalizer__sp": [self.sp, 2 * self.sp],
                 "forecaster__detrender__forecaster__degree": randint(1, 10),
                 "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha": uniform(0.001, 10),
-                "forecaster__reducer__estimator__fit_intercept": [True, False],
+                "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
+                "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
+                "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
+                "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
             }
         else:
             param_grid = {
                 "deseasonalizer__model": deseasonal_type,
-                "deseasonalizer__sp": [self.sp, 2 * self.sp],
                 "detrender__forecaster__degree": randint(1, 10),
                 "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha": uniform(0.001, 10),
-                "reducer__estimator__fit_intercept": [True, False],
+                "reducer__estimator__alpha_1": uniform(0, 1),
+                "reducer__estimator__alpha_2": uniform(0, 1),
+                "reducer__estimator__lambda_1": uniform(0, 1),
+                "reducer__estimator__lambda_2": uniform(0, 1),
             }
         return param_grid
+
+    def get_regressors(self):
+        from sklearn.linear_model import BayesianRidge
+
+        regressor_args = self.find_regressor_config(BayesianRidge())
+        return BayesianRidge(**regressor_args)

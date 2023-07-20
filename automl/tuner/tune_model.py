@@ -44,5 +44,7 @@ class ModelTuner(BaseTunner):
             grid_search.fit(self.y, X=self.x, fh=self.fh)
             logger.info(f"Best Params {grid_search.best_params_}")
             logger.info(f"Best scores {grid_search.best_score_}")
-            tuned_model.append((type(pipeline).rank, grid_search.best_forecaster_))
+            tuned_model.append(
+                (type(pipeline).identifier.name, grid_search.best_forecaster_)
+            )
         return tuned_model

@@ -18,6 +18,10 @@ class Schuduler:
         self.settings = Settings(**settings)
         self.y, self.x, self.fh = None, None, None
 
+    def set_exp_id(self, exp_id: str):
+        self.exp_id = exp_id
+        return self
+
     def set_y(self, y: pd.Series):
         self.y = y
         return self
@@ -67,9 +71,9 @@ class Schuduler:
         return self
 
     def save_tuned_models(self):
-        for model_rank, model in self.tuned_model:
-            model_name = f"model_{model_rank}.pkl"
+        for model_name, model in self.tuned_model:
+            model_name = f"{self.exp_id}_{model_name}.pkl"
             model_path = os.path.join(self.settings.model_dir, model_name)
-            logger.info(f"Saving Model ID  {model_rank} to Path {model_path}")
+            logger.info(f"Saving Model ID  {model_name} to Path {model_path}")
             joblib.dump(model, model_path)
         return self

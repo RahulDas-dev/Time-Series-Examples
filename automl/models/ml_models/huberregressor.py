@@ -1,22 +1,15 @@
-from scipy.stats.distributions import loguniform, randint
+# huber_regressor.py
+
+from scipy.stats.distributions import randint, uniform
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class LassoLars:
-    def get_regressors(self):
-        from sklearn.linear_model import LassoLars
-
-        regressor = LassoLars()
-        regressor_args = self.find_regressor_config(regressor)
-        return LassoLars(**regressor_args)
-
-
-class LassoLarsModel(MLPipelineSimple, BaseModel, LassoLars):
-    _identifier: str = ModelID.LassoLars
-    _description: str = "LassoLars Model"
+class HuberRegressorModel(MLPipelineSimple, BaseModel):
+    _identifier: str = ModelID.HuberRegressor
+    _description: str = "Huber Regressor"
     _mtype: ModelType = ModelType.ML_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -28,23 +21,31 @@ class LassoLarsModel(MLPipelineSimple, BaseModel, LassoLars):
             param_grid = {
                 "scaler_x__passthrough": [True, False],
                 "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha": loguniform(0.0000001, 1),
-                "forecaster__reducer__estimator__eps": loguniform(0.00001, 0.1),
+                "forecaster__reducer__estimator__epsilon": uniform(1.1, 2.0),
+                "forecaster__reducer__estimator__max_iter": [100],
+                "forecaster__reducer__estimator__alpha": uniform(0, 1),
                 "forecaster__reducer__estimator__fit_intercept": [True, False],
             }
         else:
             param_grid = {
                 "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha": loguniform(0.0000001, 1),
-                "reducer__estimator__eps": loguniform(0.00001, 0.1),
+                "reducer__estimator__epsilon": uniform(1.1, 2.0),
+                "reducer__estimator__max_iter": [100],
+                "reducer__estimator__alpha": uniform(0, 1),
                 "reducer__estimator__fit_intercept": [True, False],
             }
         return param_grid
 
+    def get_regressors(self):
+        from sklearn.linear_model import HuberRegressor
 
-class LassoLarsCCD(MLPipelineCCD, BaseModel, LassoLars):
-    _identifier: str = ModelID.LassoLarsCCD
-    _description: str = "LassoLars Model Conditional Deseasonalizer Detrender"
+        regressor_args = self.find_regressor_config(HuberRegressor())
+        return HuberRegressor(**regressor_args)
+
+
+class HuberRegressorCCD(MLPipelineCCD, BaseModel):
+    _identifier: str = ModelID.HuberRegressorCCD
+    _description: str = "Huber Regressor Conditional Deseasonalizer Detrender"
     _mtype: ModelType = ModelType.ML_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -59,21 +60,25 @@ class LassoLarsCCD(MLPipelineCCD, BaseModel, LassoLars):
             param_grid = {
                 "scaler_x__passthrough": [True, False],
                 "forecaster__deseasonalizer__model": deseasonal_type,
-                # "forecaster__deseasonalizer__sp": [self.sp, 2 * self.sp],
                 "forecaster__detrender__forecaster__degree": randint(1, 10),
                 "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha": loguniform(0.0000001, 1),
-                "forecaster__reducer__estimator__eps": loguniform(0.00001, 0.1),
-                "forecaster__reducer__estimator__fit_intercept": [True, False],
+                "forecaster__reducer__estimator__epsilon": uniform(1.1, 2.0),
+                "forecaster__reducer__estimator__max_iter": [100],
+                "forecaster__reducer__estimator__alpha": uniform(0, 1),
             }
         else:
             param_grid = {
                 "deseasonalizer__model": deseasonal_type,
-                # "forecaster__deseasonalizer__sp": [self.sp, 2 * self.sp],
                 "detrender__forecaster__degree": randint(1, 10),
                 "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha": loguniform(0.0000001, 1),
-                "reducer__estimator__eps": loguniform(0.00001, 0.1),
-                "reducer__estimator__fit_intercept": [True, False],
+                "reducer__estimator__epsilon": uniform(1.1, 2.0),
+                "reducer__estimator__max_iter": [100],
+                "reducer__estimator__alpha": uniform(0, 1),
             }
         return param_grid
+
+    def get_regressors(self):
+        from sklearn.linear_model import HuberRegressor
+
+        regressor_args = self.find_regressor_config(HuberRegressor())
+        return HuberRegressor(**regressor_args)
