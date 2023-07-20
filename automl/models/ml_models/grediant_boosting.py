@@ -1,16 +1,16 @@
-# decision_tree_regressor.py
+# gradient_boosting_regressor.py
 
-from scipy.stats.distributions import randint
+from scipy.stats.distributions import randint, uniform
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class DecisionTreeModel(MLPipelineSimple, BaseModel):
-    _identifier: str = ModelID.DecisionTree
-    _description: str = "Decision Tree Regressor"
-    _mtype: ModelType = ModelType.TREE_BASED_MODEL
+class GradientBoostModel(MLPipelineSimple, BaseModel):
+    _identifier: str = ModelID.GradientBoost
+    _description: str = "Gradient Boosting Regressor"
+    _mtype: ModelType = ModelType.BOOSTING_MODEL
 
     def __init__(self, stat: SeriesStat):
         super().__init__(stat)
@@ -20,29 +20,28 @@ class DecisionTreeModel(MLPipelineSimple, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__criterion": [
-                "mse",
-                "friedman_mse",
-                "mae",
-            ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
+            "forecaster__reducer__estimator__learning_rate": uniform(0.01, 0.3),
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
             "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
             "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__subsample": uniform(0.5, 1),
         }
         return param_grid
 
     def get_regressors(self):
-        from sklearn.tree import DecisionTreeRegressor
+        from sklearn.ensemble import GradientBoostingRegressor
 
-        regressor_args = self.find_regressor_config(DecisionTreeRegressor())
-        return DecisionTreeRegressor(**regressor_args)
+        regressor_args = self.find_regressor_config(GradientBoostingRegressor())
+        return GradientBoostingRegressor(**regressor_args)
 
 
-class DecisionTreeCCD(MLPipelineCCD, BaseModel):
-    _identifier: str = ModelID.DecisionTreeCCD
-    _description: str = "Decision Tree Regressor Conditional Deseasonalizer Detrender"
-    _mtype: ModelType = ModelType.TREE_BASED_MODEL
+class GradientBoostCCD(MLPipelineCCD, BaseModel):
+    _identifier: str = ModelID.GradientBoostCCD
+    _description: str = (
+        "Gradient Boosting Regressor Conditional Deseasonalizer Detrender"
+    )
+    _mtype: ModelType = ModelType.BOOSTING_MODEL
 
     def __init__(self, stat: SeriesStat):
         super().__init__(stat)
@@ -57,20 +56,17 @@ class DecisionTreeCCD(MLPipelineCCD, BaseModel):
             "forecaster__deseasonalizer__model": deseasonal_type,
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__criterion": [
-                "mse",
-                "friedman_mse",
-                "mae",
-            ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
+            "forecaster__reducer__estimator__learning_rate": uniform(0.01, 0.3),
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
             "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
             "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__subsample": uniform(0.5, 1),
         }
         return param_grid
 
     def get_regressors(self):
-        from sklearn.tree import DecisionTreeRegressor
+        from sklearn.ensemble import GradientBoostingRegressor
 
-        rregressor_args = self.find_regressor_config(DecisionTreeRegressor())
-        return DecisionTreeRegressor(**rregressor_args)
+        regressor_args = self.find_regressor_config(GradientBoostingRegressor())
+        return GradientBoostingRegressor(**regressor_args)

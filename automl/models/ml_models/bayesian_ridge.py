@@ -8,32 +8,22 @@ from automl.stat.statistics import SeriesStat
 class BayesianRidgeModel(MLPipelineSimple, BaseModel):
     _identifier: str = ModelID.BayesianRidge
     _description: str = "Bayesian Ridge Regression"
-    _mtype: ModelType = ModelType.ML_MODEL
+    _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
         super().__init__(stat)
 
     @property
     def hyper_parameters(self):
-        if self.has_exogeneous_data:
-            param_grid = {
-                "scaler_x__passthrough": [True, False],
-                "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
-                "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
-                "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
-                "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
-                "forecaster__reducer__estimator__fit_intercept": [True, False],
-            }
-        else:
-            param_grid = {
-                "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha_1": uniform(0, 1),
-                "reducer__estimator__alpha_2": uniform(0, 1),
-                "reducer__estimator__lambda_1": uniform(0, 1),
-                "reducer__estimator__lambda_2": uniform(0, 1),
-                "reducer__estimator__fit_intercept": [True, False],
-            }
+        param_grid = {
+            "scaler_x__passthrough": [True, False],
+            "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
+            "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
+            "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
+            "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
+            "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
+            "forecaster__reducer__estimator__fit_intercept": [True, False],
+        }
         return param_grid
 
     def get_regressors(self):
@@ -46,7 +36,7 @@ class BayesianRidgeModel(MLPipelineSimple, BaseModel):
 class BayesianRidgeCCD(MLPipelineCCD, BaseModel):
     _identifier: str = ModelID.BayesianRidgeCCD
     _description: str = "Bayesian Ridge Regression Conditional Deseasonalizer Detrender"
-    _mtype: ModelType = ModelType.ML_MODEL
+    _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
         super().__init__(stat)
@@ -56,27 +46,16 @@ class BayesianRidgeCCD(MLPipelineCCD, BaseModel):
         deseasonal_type = (
             ["additive", "multiplicative"] if self.strictly_positive else ["additive"]
         )
-        if self.has_exogeneous_data:
-            param_grid = {
-                "scaler_x__passthrough": [True, False],
-                "forecaster__deseasonalizer__model": deseasonal_type,
-                "forecaster__detrender__forecaster__degree": randint(1, 10),
-                "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-                "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
-                "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
-                "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
-                "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
-            }
-        else:
-            param_grid = {
-                "deseasonalizer__model": deseasonal_type,
-                "detrender__forecaster__degree": randint(1, 10),
-                "reducer__window_length": randint(self.sp, 2 * self.sp),
-                "reducer__estimator__alpha_1": uniform(0, 1),
-                "reducer__estimator__alpha_2": uniform(0, 1),
-                "reducer__estimator__lambda_1": uniform(0, 1),
-                "reducer__estimator__lambda_2": uniform(0, 1),
-            }
+        param_grid = {
+            "scaler_x__passthrough": [True, False],
+            "forecaster__deseasonalizer__model": deseasonal_type,
+            "forecaster__detrender__forecaster__degree": randint(1, 10),
+            "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
+            "forecaster__reducer__estimator__alpha_1": uniform(0, 1),
+            "forecaster__reducer__estimator__alpha_2": uniform(0, 1),
+            "forecaster__reducer__estimator__lambda_1": uniform(0, 1),
+            "forecaster__reducer__estimator__lambda_2": uniform(0, 1),
+        }
         return param_grid
 
     def get_regressors(self):

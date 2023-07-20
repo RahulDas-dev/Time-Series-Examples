@@ -1,5 +1,3 @@
-# huber_regressor.py
-
 from scipy.stats.distributions import randint, uniform
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
@@ -7,9 +5,20 @@ from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class HuberRegressorModel(MLPipelineSimple, BaseModel):
-    _identifier: str = ModelID.HuberRegressor
-    _description: str = "Huber Regressor"
+class Ridge:
+    def get_regressors(self):
+        try:
+            from sklearnex.linear_model import Ridge
+        except ImportError:
+            from sklearn.linear_model import Ridge
+        regressor = Ridge()
+        regressor_args = self.find_regressor_config(regressor)
+        return Ridge(**regressor_args)
+
+
+class RidgeModel(MLPipelineSimple, BaseModel, Ridge):
+    _identifier: str = ModelID.Ridge
+    _description: str = "Ridge Model"
     _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -20,23 +29,15 @@ class HuberRegressorModel(MLPipelineSimple, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__epsilon": uniform(1.1, 2.0),
-            "forecaster__reducer__estimator__max_iter": [100],
-            "forecaster__reducer__estimator__alpha": uniform(0, 1),
+            "forecaster__reducer__estimator__alpha": uniform(0.001, 10),
             "forecaster__reducer__estimator__fit_intercept": [True, False],
         }
         return param_grid
 
-    def get_regressors(self):
-        from sklearn.linear_model import HuberRegressor
 
-        regressor_args = self.find_regressor_config(HuberRegressor())
-        return HuberRegressor(**regressor_args)
-
-
-class HuberRegressorCCD(MLPipelineCCD, BaseModel):
-    _identifier: str = ModelID.HuberRegressorCCD
-    _description: str = "Huber Regressor Conditional Deseasonalizer Detrender"
+class RidgeCCD(MLPipelineCCD, BaseModel, Ridge):
+    _identifier: str = ModelID.RidgeCCD
+    _description: str = "Ridge Model Conditional Deseasonalizer Detrender"
     _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -50,16 +51,10 @@ class HuberRegressorCCD(MLPipelineCCD, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__deseasonalizer__model": deseasonal_type,
+            "forecaster__deseasonalizer__sp": [self.sp, 2 * self.sp],
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__epsilon": uniform(1.1, 2.0),
-            "forecaster__reducer__estimator__max_iter": [100],
-            "forecaster__reducer__estimator__alpha": uniform(0, 1),
+            "forecaster__reducer__estimator__alpha": uniform(0.001, 10),
+            "forecaster__reducer__estimator__fit_intercept": [True, False],
         }
         return param_grid
-
-    def get_regressors(self):
-        from sklearn.linear_model import HuberRegressor
-
-        regressor_args = self.find_regressor_config(HuberRegressor())
-        return HuberRegressor(**regressor_args)

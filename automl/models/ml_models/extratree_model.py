@@ -1,15 +1,15 @@
-# decision_tree_regressor.py
+# extra_trees_regressor.py
 
-from scipy.stats.distributions import randint
+from scipy.stats.distributions import randint, uniform
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class DecisionTreeModel(MLPipelineSimple, BaseModel):
-    _identifier: str = ModelID.DecisionTree
-    _description: str = "Decision Tree Regressor"
+class ExtraTreesModel(MLPipelineSimple, BaseModel):
+    _identifier: str = ModelID.ExtraTrees
+    _description: str = "Extra Trees Regressor"
     _mtype: ModelType = ModelType.TREE_BASED_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -20,28 +20,25 @@ class DecisionTreeModel(MLPipelineSimple, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__criterion": [
-                "mse",
-                "friedman_mse",
-                "mae",
-            ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
+            "forecaster__reducer__estimator__criterion": ["mse", "mae"],
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
             "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
             "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__max_features": uniform(0.1, 1.0),
         }
         return param_grid
 
     def get_regressors(self):
-        from sklearn.tree import DecisionTreeRegressor
+        from sklearn.ensemble import ExtraTreesRegressor
 
-        regressor_args = self.find_regressor_config(DecisionTreeRegressor())
-        return DecisionTreeRegressor(**regressor_args)
+        regressor_args = self.find_regressor_config(ExtraTreesRegressor())
+        return ExtraTreesRegressor(**regressor_args)
 
 
-class DecisionTreeCCD(MLPipelineCCD, BaseModel):
-    _identifier: str = ModelID.DecisionTreeCCD
-    _description: str = "Decision Tree Regressor Conditional Deseasonalizer Detrender"
+class ExtraTreesCCD(MLPipelineCCD, BaseModel):
+    _identifier: str = ModelID.ExtraTreesCCD
+    _description: str = "Extra Trees Regressor Conditional Deseasonalizer Detrender"
     _mtype: ModelType = ModelType.TREE_BASED_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -57,20 +54,17 @@ class DecisionTreeCCD(MLPipelineCCD, BaseModel):
             "forecaster__deseasonalizer__model": deseasonal_type,
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__criterion": [
-                "mse",
-                "friedman_mse",
-                "mae",
-            ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
+            "forecaster__reducer__estimator__criterion": ["mse", "mae"],
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
             "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
             "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__max_features": uniform(0.1, 1.0),
         }
         return param_grid
 
     def get_regressors(self):
-        from sklearn.tree import DecisionTreeRegressor
+        from sklearn.ensemble import ExtraTreesRegressor
 
-        rregressor_args = self.find_regressor_config(DecisionTreeRegressor())
-        return DecisionTreeRegressor(**rregressor_args)
+        regressor_args = self.find_regressor_config(ExtraTreesRegressor())
+        return ExtraTreesRegressor(**regressor_args)

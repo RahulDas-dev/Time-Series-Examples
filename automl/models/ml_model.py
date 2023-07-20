@@ -42,19 +42,13 @@ class MLPipleline:
             regressor_args["seed"] = 80
         return regressor_args
 
-    @property
-    def forecasting_pipeline(self) -> ForecastingPipeline:
-        if self.has_exogeneous_data:
-            return self.pipeline_x()
-        else:
-            return self.pipeline_not_x()
-
 
 class MLPipelineSimple(MLPipleline):
     def __init__(self, stat: SeriesStat) -> None:
         super().__init__(stat)
 
-    def pipeline_x(self):
+    @property
+    def forecasting_pipeline(self) -> ForecastingPipeline:
         forecaster_pipe = ForecastingPipeline(
             steps=[
                 ("column_Gaurd", ColumnsGuard()),
@@ -87,30 +81,13 @@ class MLPipelineSimple(MLPipleline):
         )
         return forecaster_pipe
 
-    def pipeline_not_x(self):
-        forecaster_pipe = TransformedTargetForecaster(
-            steps=[
-                ("imputer_y", Imputer(method="ffill", random_state=80)),
-                (
-                    "reducer",
-                    make_reduction(
-                        estimator=DummyForecaster(),
-                        scitype="tabular-regressor",
-                        window_length=self.sp,
-                        strategy="recursive",
-                        pooling="global",
-                    ),
-                ),
-            ]
-        )
-        return forecaster_pipe
-
 
 class MLPipelineCCD(MLPipleline):
     def __init__(self, stat: SeriesStat) -> None:
         super().__init__(stat)
 
-    def pipeline_x(self):
+    @property
+    def forecasting_pipeline(self) -> ForecastingPipeline:
         forecaster_pipe = ForecastingPipeline(
             steps=[
                 ("column_Gaurd", ColumnsGuard()),
@@ -147,32 +124,6 @@ class MLPipelineCCD(MLPipleline):
                                 ),
                             ),
                         ]
-                    ),
-                ),
-            ]
-        )
-        return forecaster_pipe
-
-    def pipeline_not_x(self):
-        forecaster_pipe = TransformedTargetForecaster(
-            steps=[
-                ("imputer_y", Imputer(method="ffill", random_state=80)),
-                (
-                    "deseasonalizer",
-                    ConditionalDeseasonalizer(model="additive", sp=self.sp),
-                ),
-                (
-                    "detrender",
-                    Detrender(forecaster=PolynomialTrendForecaster(degree=1)),
-                ),
-                (
-                    "reducer",
-                    make_reduction(
-                        estimator=DummyForecaster(),
-                        scitype="tabular-regressor",
-                        window_length=self.sp,
-                        strategy="recursive",
-                        pooling="global",
                     ),
                 ),
             ]

@@ -3,10 +3,13 @@ from enum import IntEnum, unique
 
 @unique
 class ModelType(IntEnum):
-    NV_MODEL = 1
-    EC_MODEL = 2
-    ML_MODEL = 3
-    DL_MODEL = 4
+    NAIVE_MODEL = 1
+    ECONOMETRIC_MODEL = 2
+    LINEAR_MODEL = 3
+    TREE_BASED_MODEL = 4
+    DISTANCE_BASED_MODEL = 5
+    BOOSTING_MODEL = 6
+    DL_MODEL = 7
 
 
 @unique
@@ -35,6 +38,14 @@ class ModelID(IntEnum):
     XGBoostCCD = 25
     LightGBM = 26
     LightGBMCCD = 27
+    CatBoost = 28
+    CatBoostCCD = 29
+    ExtraTrees = 30
+    ExtraTreesCCD = 31
+    GradientBoost = 32
+    GradientBoostCCD = 33
+    AdaBoost = 33
+    AdaBoostCCD = 34
 
 
 class BaseModel:

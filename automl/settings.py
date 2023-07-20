@@ -1,5 +1,15 @@
 import os
 from dataclasses import dataclass
+from enum import IntEnum
+
+
+class SchudulerState(IntEnum):
+    Init = 0
+    SetUP = 1
+    ExtractingStat = 2
+    SelectingModel = 3
+    TunningModel = 4
+    SavingModel = 5
 
 
 @dataclass(frozen=True)

@@ -1,24 +1,24 @@
-from scipy.stats.distributions import randint, uniform
+from scipy.stats.distributions import randint
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
 from automl.stat.statistics import SeriesStat
 
 
-class ElasticNet:
+class Linear:
     def get_regressors(self):
         try:
-            from sklearnex.linear_model import ElasticNet
+            from sklearnex.linear_model import LinearRegression
         except ImportError:
-            from sklearn.linear_model import ElasticNet
-        regressor = ElasticNet()
+            from sklearn.linear_model import LinearRegression
+        regressor = LinearRegression()
         regressor_args = self.find_regressor_config(regressor)
-        return ElasticNet(**regressor_args)
+        return LinearRegression(**regressor_args)
 
 
-class ElasticNetModel(MLPipelineSimple, BaseModel, ElasticNet):
-    _identifier: str = ModelID.Elasticnet
-    _description: str = "ElasticNet "
+class LinearModel(MLPipelineSimple, BaseModel, Linear):
+    _identifier: str = ModelID.Linear
+    _description: str = "Liner Model"
     _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -29,17 +29,14 @@ class ElasticNetModel(MLPipelineSimple, BaseModel, ElasticNet):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__alpha": uniform(0, 1),
-            "forecaster__reducer__estimator__l1_ratio": uniform(0.01, 0.9999999999),
-            "forecaster__reducer__estimator__max_iter": [10000],
             "forecaster__reducer__estimator__fit_intercept": [True, False],
         }
         return param_grid
 
 
-class ElasticNetCCD(MLPipelineCCD, BaseModel, ElasticNet):
-    _identifier: str = ModelID.ElasticnetCCD
-    _description: str = "ElasticNet Conditional Deseasonalizer Detrender"
+class LinearModelCCD(MLPipelineCCD, BaseModel, Linear):
+    _identifier: str = ModelID.LinearCCD
+    _description: str = "Liner Model Conditional Deseasonalizer Detrender"
     _mtype: ModelType = ModelType.LINEAR_MODEL
 
     def __init__(self, stat: SeriesStat):
@@ -47,18 +44,15 @@ class ElasticNetCCD(MLPipelineCCD, BaseModel, ElasticNet):
 
     @property
     def hyper_parameters(self):
-        deseasonal_type = (
+        deseason_type = (
             ["additive", "multiplicative"] if self.strictly_positive else ["additive"]
         )
         param_grid = {
             "scaler_x__passthrough": [True, False],
-            "forecaster__deseasonalizer__model": deseasonal_type,
+            "forecaster__deseasonalizer__model": deseason_type,
             # "forecaster__deseasonalizer__sp": [self.sp, 2 * self.sp],
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__alpha": uniform(0, 1),
-            "forecaster__reducer__estimator__l1_ratio": uniform(0.01, 0.9999999999),
-            "forecaster__reducer__estimator__max_iter": [10000],
-            # "forecaster__reducer__estimator__fit_intercept": [True, False],
+            "forecaster__reducer__estimator__fit_intercept": [True, False],
         }
         return param_grid
