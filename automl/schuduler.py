@@ -7,7 +7,7 @@ import pandas as pd
 
 from automl.settings import Settings
 from automl.stat.statistics import ExtractStats
-from automl.tuner.model_selection import ModelSelector
+from automl.tuner.model_selection import ModelComparator
 from automl.tuner.tune_model import ModelTuner
 
 logger = logging.getLogger(__name__)
@@ -49,27 +49,32 @@ class Schuduler:
         logger.info(self._statistics)
         return self
 
-    def select_model(self):
+    def compare_models(self):
         logger.info("Selecting Models from ...\n")
-        self._model_ids, result = (
-            ModelSelector(**vars(self._settings))
+        self._result = (
+            ModelComparator(**vars(self._settings))
             .set_y(self._y)
             .set_x(self._x)
             .set_fh(self._fh)
-            .select_models(self._statistics)
+            .compare(self._statistics)
         )
-        print(result)
+        print(self._result)
         return self
 
-    def tune_models(self):
+    def tune_hyperparameters(self):
         logger.info("Tunning Selected Models ...")
         self._tuned_model = (
             ModelTuner(**vars(self._settings))
             .set_y(self._y)
             .set_x(self._x)
             .set_fh(self._fh)
-            .tune_model(self._statistics, self._model_ids)
+            .tune_model(self._statistics, self._result)
         )
+        return self
+    
+    def finalize_model(self):
+        logger.info("Tunning Selected Models ...")
+        
         return self
 
     def save_tuned_models(self):
@@ -80,3 +85,9 @@ class Schuduler:
             logger.info(f"Saving Model ID  {model_name} to Path {model_path}")
             joblib.dump(model, model_path)
         return self
+    
+    def get_metrics(self) -> Dict:
+        return {}
+
+    def get_test_predictions(self) -> pd.Series:
+        pass

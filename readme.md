@@ -1,3 +1,5 @@
+.venv\Scripts\activate.bat
+
 # List of time series Python Librarys
 
 1. [sktime](https://github.com/sktime/sktime)
