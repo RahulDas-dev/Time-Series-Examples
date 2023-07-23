@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict
 
 from sklearn.preprocessing import MinMaxScaler
@@ -14,6 +15,8 @@ from sktime.transformations.series.impute import Imputer
 from automl.models.ml_models.customized.dummyforecaster import DummyForecaster
 from automl.models.ml_models.customized.inputguard import ColumnsGuard
 from automl.stat.statistics import SeriesStat
+
+logger = logging.getLogger(__name__)
 
 
 class MLPipleline:
@@ -40,6 +43,9 @@ class MLPipleline:
             regressor_args["random_state"] = 80
         if hasattr(regressor, "seed"):
             regressor_args["seed"] = 80
+        if hasattr(regressor, "verbose"):
+            regressor["verbose"] = 0
+        # logger.info(regressor_args)
         return regressor_args
 
 

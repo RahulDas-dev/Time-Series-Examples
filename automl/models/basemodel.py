@@ -44,8 +44,8 @@ class ModelID(IntEnum):
     ExtraTreesCCD = 31
     GradientBoost = 32
     GradientBoostCCD = 33
-    AdaBoost = 33
-    AdaBoostCCD = 34
+    AdaBoost = 34
+    AdaBoostCCD = 35
 
 
 class BaseModel:

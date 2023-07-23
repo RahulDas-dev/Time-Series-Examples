@@ -5,13 +5,15 @@ from sktime.performance_metrics.forecasting import (
     MeanAbsoluteError, MeanAbsolutePercentageError, MeanAbsoluteScaledError,
     MeanSquaredError)
 
+from automl.stat.statistics import SeriesStat
 
-class BaseTunner:
+
+class Base:
     def __init__(self, model_select_count: int, cv_split: int, metric: str):
         self.model_select_count = model_select_count
         self.cv_split = cv_split
         self.metric = metric
-        self.y, self.x, self.fh = None, None, None
+        self.y, self.x, self.fh, self.stat = None, None, None, None
 
     def set_y(self, y: pd.Series):
         self.y = y
@@ -23,6 +25,10 @@ class BaseTunner:
 
     def set_fh(self, fh: int):
         self.fh = np.arange(1, fh + 1)
+        return self
+
+    def set_statistics(self, stat: SeriesStat):
+        self.stat = stat
         return self
 
     def get_crossvalidate_spliter(self):

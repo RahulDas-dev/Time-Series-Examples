@@ -1,24 +1,23 @@
 import logging
-from typing import List
+from typing import Dict, List, Optional
 
 import pandas as pd
 from sktime.forecasting.model_evaluation import evaluate
 
+from automl.lifecycle.base import Base
 from automl.model_db import ModelQuery
 from automl.models.basemodel import ModelID
-from automl.stat.statistics import SeriesStat
-from automl.tuner.base_tunner import BaseTunner
 
 logger = logging.getLogger(__name__)
 
 
-class ModelComparator(BaseTunner):
+class ModelComparator(Base):
     def __init__(self, model_select_count: int, cv_split: int, metric: str, **kwargs):
         super().__init__(model_select_count, cv_split, metric)
-        self.y, self.x, self.fh = None, None, None
+        self.y, self.x, self.fh, self.stat = None, None, None, None
 
-    def compare(self, stat: SeriesStat) -> pd.DataFrame:
-        models_list = ModelQuery.find_all_model_object(stat)
+    def compare(self, filter: Optional[Dict] = None) -> pd.DataFrame:
+        models_list = ModelQuery.select_model_object(self.stat, filter)
         if len(models_list) <= self.model_select_count:
             logger.info("Skipping Model Selection ")
             return self.build_empty_result_dir(models_list)
@@ -36,17 +35,16 @@ class ModelComparator(BaseTunner):
                 scoring=self.get_all_scoring_matric(),
                 return_data=False,
                 backend="loky",
+                verbose=-1,
             )
             d_temp = {
                 "model_id": type(model).identifier,
                 "model_name": type(model).identifier.name,
-                # "model_rank": type(model).rank,
-                "model": model,
                 "mae": eval_data["test_MeanAbsoluteError"].mean(),
                 "rmse": eval_data["test_MeanSquaredError"].mean(),
                 "mape": eval_data["test_MeanAbsolutePercentageError"].mean(),
                 "mase": eval_data["test_MeanAbsoluteScaledError"].mean(),
-                "fit_time": eval_data["fit_time"].max()
+                "fit_time": eval_data["fit_time"].max(),
             }
             results_list.append(d_temp)
             logger.info(f"evaluate results : {d_temp[self.metric]}")
@@ -54,20 +52,18 @@ class ModelComparator(BaseTunner):
         result_df.sort_values(by=self.metric, ignore_index=True, inplace=True)
         # model_ids = final_result["model_id"].to_list()[: self.model_select_count]
         return result_df
-    
+
     def build_empty_result_dir(self, model_list: List[ModelID]) -> pd.DataFrame:
         results_list = []
         for model in model_list:
             d_temp = {
                 "model_id": type(model).identifier,
                 "model_name": type(model).identifier.name,
-                "model": model,
-                # "model_rank": type(model).rank,
-                "mae":  -1,
+                "mae": -1,
                 "rmse": -1,
                 "mape": -1,
                 "mase": -1,
-                "fit_time": 0
+                "fit_time": 0,
             }
             results_list.append(d_temp)
         return pd.DataFrame.from_dict(results_list)

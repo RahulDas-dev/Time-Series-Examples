@@ -48,18 +48,18 @@ class ExtractStats:
     SP_DETECTION_ALGO: str = "AUTO"  # 'INDEX'
 
     def __init__(self, frequency: str, has_exogen_data: bool = False):
-        self.__frequency = frequency
-        self.__is_strickly_positive = False
-        self.__is_white_noise = False
-        self.__is_seasonal = False
-        self.__seasonality_type = None
-        self.__primary_sp = 1
-        self.__candidate_sps = []
-        self.__significant_sps = []
-        self.__all_sps_to_use = []
-        self.__lowercase_d = 0
-        self.__uppercase_d = 0
-        self.__has_exogenous_data = has_exogen_data
+        self._frequency = frequency
+        self._is_strickly_positive = False
+        self._is_white_noise = False
+        self._is_seasonal = False
+        self._seasonality_type = None
+        self._primary_sp = 1
+        self._candidate_sps = []
+        self._significant_sps = []
+        self._all_sps_to_use = []
+        self._lowercase_d = 0
+        self._uppercase_d = 0
+        self._has_exogenous_data = has_exogen_data
 
     def extract_statistics(self, data: Union[np.ndarray, pd.Series]) -> SeriesStat:
         data_ = data.copy(deep=True)
@@ -71,23 +71,23 @@ class ExtractStats:
             .detect_upper_d(data_)
         )
         return SeriesStat(
-            self.__frequency,
-            self.__is_strickly_positive,
-            self.__is_white_noise,
-            self.__is_seasonal,
-            self.__seasonality_type,
-            self.__primary_sp,
-            self.__candidate_sps,
-            self.__significant_sps,
-            self.__all_sps_to_use,
-            self.__lowercase_d,
-            self.__uppercase_d,
-            self.__has_exogenous_data,
+            self._frequency,
+            self._is_strickly_positive,
+            self._is_white_noise,
+            self._is_seasonal,
+            self._seasonality_type,
+            self._primary_sp,
+            self._candidate_sps,
+            self._significant_sps,
+            self._all_sps_to_use,
+            self._lowercase_d,
+            self._uppercase_d,
+            self._has_exogenous_data,
         )
 
     def detect_is_strickly_positive(self, data: Union[np.ndarray, pd.Series]):
         strictly_positive = np.all(data > 0)
-        self.__is_strickly_positive = strictly_positive
+        self._is_strickly_positive = strictly_positive
         return self
 
     def detect_seasonality_periods(self, data: Union[np.ndarray, pd.Series]):
@@ -156,11 +156,11 @@ class ExtractStats:
         # logger.info(f"ignificant_sps    {significant_sps}")
         # logger.info(f"all_sps_to_use    {all_sps_to_use}")
 
-        self.__is_seasonal = seasonality_present
-        self.__primary_sp = all_sps_to_use[0]
-        self.__candidate_sps = candidate_sps
-        self.__significant_sps = significant_sps
-        self.__all_sps_to_use = all_sps_to_use
+        self._is_seasonal = seasonality_present
+        self._primary_sp = all_sps_to_use[0]
+        self._candidate_sps = candidate_sps
+        self._significant_sps = significant_sps
+        self._all_sps_to_use = all_sps_to_use
         return self
 
     def detect_seasonality_type(self, data: Union[np.ndarray, pd.Series]):
@@ -168,16 +168,16 @@ class ExtractStats:
         # seasonality_present, primary_sp, _, _  = cls.detect_seasonality(data)
         # logger.info("detecting seasonality Type ...")
         seasonality_type = None
-        if self.__is_seasonal is False:
+        if self._is_seasonal is False:
             seasonality_type = None
-        elif self.__is_seasonal and (not self.__is_strickly_positive):
+        elif self._is_seasonal and (not self._is_strickly_positive):
             seasonality_type = "Additive"
-        elif self.__is_seasonal and self.__is_strickly_positive:
+        elif self._is_seasonal and self._is_strickly_positive:
             decomp_add = seasonal_decompose(
-                data, period=self.__primary_sp, model="additive"
+                data, period=self._primary_sp, model="additive"
             )
             decomp_mult = seasonal_decompose(
-                data, period=self.__primary_sp, model="multiplicative"
+                data, period=self._primary_sp, model="multiplicative"
             )
             if decomp_add is None or decomp_mult is None:
                 seasonality_type = "Multiplicative"
@@ -196,35 +196,35 @@ class ExtractStats:
                     seasonality_type = "Additive"
         else:
             seasonality_type = None
-        self.__seasonality_type = seasonality_type
+        self._seasonality_type = seasonality_type
         # logger.info(f"seasonality Type {seasonality_type}")
         return self
 
     def detect_lowr_d(self, data: Union[np.ndarray, pd.Series]):
         # logger.info("detecting lowercase_d ...")
-        self.__lowercase_d = ndiffs(data)
-        # logger.info(f"lowercase_d ...{self.__lowercase_d}")
+        self._lowercase_d = ndiffs(data)
+        # logger.info(f"lowercase_d ...{self._lowercase_d}")
         return self
 
     def detect_upper_d(self, data: Union[np.ndarray, pd.Series]):
         # recommended_uppercase_d = nsdiffs(data, m=self.primary_sp_2_use)
         # logger.info("detecting upper_d ...")
-        if self.__primary_sp > 1:
+        if self._primary_sp > 1:
             try:
                 max_D = 2
-                uppercase_d = nsdiffs(x=data, m=self.__primary_sp, max_D=max_D)
+                uppercase_d = nsdiffs(x=data, m=self._primary_sp, max_D=max_D)
             except ValueError:
                 logger.info("Test for computing 'D' failed at max_D = 2.")
                 try:
                     max_D = 1
-                    uppercase_d = nsdiffs(x=data, m=self.__primary_sp, max_D=max_D)
+                    uppercase_d = nsdiffs(x=data, m=self._primary_sp, max_D=max_D)
                 except ValueError:
                     logger.info("Test for computing 'D' failed at max_D = 1.")
                     uppercase_d = 0
         else:
             uppercase_d = 0
-        self.__uppercase_d = uppercase_d
-        # logger.info(f"uppercase_d ...{self.__uppercase_d}")
+        self._uppercase_d = uppercase_d
+        # logger.info(f"uppercase_d ...{self._uppercase_d}")
         return self
 
     def remove_harmonics(

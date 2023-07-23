@@ -64,6 +64,7 @@ if __name__ == "__main__":
         "model_select_count": 1,
         "cv_split": 5,
         "metric": "mase",
+        "filter": {"ModelId": ["LightGBMCCD", "LightGBM"]},
     }
     app = (
         Schuduler(settings)

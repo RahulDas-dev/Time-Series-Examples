@@ -7,3 +7,6 @@ sktime
 seaborn
 statsmodels
 scikit-learn-intelex
+lightgbm
+xgboost
+catboost
