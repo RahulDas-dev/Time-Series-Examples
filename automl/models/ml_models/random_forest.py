@@ -1,6 +1,6 @@
 # random_forest_regressor.py
 
-from scipy.stats.distributions import randint
+from scipy.stats.distributions import randint, uniform
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
@@ -20,16 +20,18 @@ class RandomForestModel(MLPipelineSimple, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__n_estimators": randint(10, 100),
+            "forecaster__reducer__estimator__n_estimators": randint(10, 300),
             "forecaster__reducer__estimator__criterion": ["mse", "mae"],
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
-            "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
-            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__min_samples_split": randint(2, 6),
+            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 10),
             "forecaster__reducer__estimator__max_features": [
                 "auto",
                 "sqrt",
                 "log2",
             ],
+            "forecaster__reducer__estimator__min_impurity_decrease": uniform(0, 0.5),
+            "forecaster__reducer__estimator__bootstrap": [True, False],
         }
         return param_grid
 
@@ -58,16 +60,18 @@ class RandomForestCCD(MLPipelineCCD, BaseModel):
             "forecaster__deseasonalizer__model": deseasonal_type,
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__n_estimators": randint(10, 100),
+            "forecaster__reducer__estimator__n_estimators": randint(10, 300),
             "forecaster__reducer__estimator__criterion": ["mse", "mae"],
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
-            "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
-            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__min_samples_split": randint(2, 6),
+            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 10),
             "forecaster__reducer__estimator__max_features": [
                 "auto",
                 "sqrt",
                 "log2",
             ],
+            "forecaster__reducer__estimator__min_impurity_decrease": uniform(0, 0.5),
+            "forecaster__reducer__estimator__bootstrap": [True, False],
         }
         return param_grid
 

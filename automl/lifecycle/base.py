@@ -31,8 +31,7 @@ class Base:
         self.stat = stat
         return self
 
-    def get_crossvalidate_spliter(self):
-        y_size = len(self.y)
+    def get_crossvalidate_spliter(self, y_size: int):
         step_length = len(self.fh)
         fh_max_length = max(self.fh)
         intital_window_size = y_size - (

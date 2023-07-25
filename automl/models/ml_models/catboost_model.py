@@ -20,11 +20,9 @@ class CatBoostModel(MLPipelineSimple, BaseModel):
         param_grid = {
             "scaler_x__passthrough": [True, False],
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
-            "forecaster__reducer__estimator__learning_rate": uniform(0.01, 0.3),
-            "forecaster__reducer__estimator__depth": randint(1, 10),
-            "forecaster__reducer__estimator__rsm": uniform(0.5, 1),
-            "forecaster__reducer__estimator__l2_leaf_reg": uniform(1, 10),
+            "forecaster__reducer__estimator__eta": uniform(0.000001, 0.5),
+            "forecaster__reducer__estimator__n_estimators": randint(10, 30),
+            "forecaster__reducer__estimator__depth": randint(1, 11),
         }
         return param_grid
 
@@ -32,7 +30,9 @@ class CatBoostModel(MLPipelineSimple, BaseModel):
         from catboost import CatBoostRegressor
 
         regressor_args = self.find_regressor_config(CatBoostRegressor())
-        return CatBoostRegressor(**regressor_args)
+        return CatBoostRegressor(
+            **regressor_args, allow_writing_files=False, silent=True, verbose=False
+        )
 
 
 class CatBoostCCD(MLPipelineCCD, BaseModel):
@@ -53,11 +53,9 @@ class CatBoostCCD(MLPipelineCCD, BaseModel):
             "forecaster__deseasonalizer__model": deseasonal_type,
             "forecaster__detrender__forecaster__degree": randint(1, 10),
             "forecaster__reducer__window_length": randint(self.sp, 2 * self.sp),
-            "forecaster__reducer__estimator__n_estimators": randint(50, 150),
-            "forecaster__reducer__estimator__learning_rate": uniform(0.01, 0.3),
-            "forecaster__reducer__estimator__depth": randint(1, 10),
-            "forecaster__reducer__estimator__rsm": uniform(0.5, 1),
-            "forecaster__reducer__estimator__l2_leaf_reg": uniform(1, 10),
+            "forecaster__reducer__estimator__eta": uniform(0.000001, 0.5),
+            "forecaster__reducer__estimator__n_estimators": randint(10, 30),
+            "forecaster__reducer__estimator__depth": randint(1, 11),
         }
         return param_grid
 
@@ -65,4 +63,6 @@ class CatBoostCCD(MLPipelineCCD, BaseModel):
         from catboost import CatBoostRegressor
 
         regressor_args = self.find_regressor_config(CatBoostRegressor())
-        return CatBoostRegressor(**regressor_args)
+        return CatBoostRegressor(
+            **regressor_args, allow_writing_files=False, silent=True, verbose=False
+        )

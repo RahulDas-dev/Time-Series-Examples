@@ -3,6 +3,9 @@ from typing import List, Tuple
 
 import pandas as pd
 from sktime.forecasting.model_selection import ForecastingRandomizedSearchCV
+from sktime.performance_metrics.forecasting import (
+    MeanAbsoluteError, MeanAbsolutePercentageError, MeanAbsoluteScaledError,
+    MeanSquaredError)
 
 from automl.lifecycle.base import Base
 from automl.model_db import ModelQuery
@@ -42,7 +45,7 @@ class HyperParamsTuner(Base):
                 pipeline.forecaster,
                 strategy="refit",
                 scoring=self.get_scoring_metric(),
-                cv=self.get_crossvalidate_spliter(),
+                cv=self.get_crossvalidate_spliter(len(train_y)),
                 param_distributions=pipeline.hyper_parameters,
                 verbose=10,
                 n_jobs=-1,
@@ -55,7 +58,7 @@ class HyperParamsTuner(Base):
             logger.info(f"Best scores {grid_search.best_score_}")
             self.tuned_models.append(
                 (
-                    type(pipeline).identifier.name,
+                    str(type(pipeline).identifier.name),
                     grid_search.best_forecaster_,
                     grid_search.best_score_,
                 )
@@ -66,28 +69,29 @@ class HyperParamsTuner(Base):
 
     def get_predictions(self):
         _, (test_x, test_y) = self.get_training_test_data()
-        test_y.rename("Real")
+        test_y.rename("Real", inplace=True)
         y_predcitions = [test_y]
         best_model_id = self.tuned_models[0][0]
         final_model = self.tuned_models[0][1]
         for model_name, model, _ in self.tuned_models:
-            y_pred = model.predict(fh=self.fh, X=test_x)
-            y_pred.rename(str(model_name))
-            y_predcitions.append(y_pred)
+            logger.info(f"Predicting {model_name} .... ")
+            y_pred_t = model.predict(fh=self.fh, X=test_x)
+            y_pred_t.columns = [model_name]
+            y_predcitions.append(y_pred_t)
         return_df = pd.concat(y_predcitions, axis=1)
-        print(return_df)
         return_df["Best_model"] = return_df[best_model_id].copy()
+        print(return_df)
         scoring_metrics = []
         for y_pred in y_predcitions:
             temp = {}
-            mae = self.get_scoring_metric("mae")
+            mae = MeanAbsoluteError()
             temp["mae"] = mae(test_y, y_pred)
-            rmse = self.get_scoring_metric("rmse")
+            rmse = MeanSquaredError(square_root=True)
             temp["rmse"] = rmse(test_y, y_pred)
-            mape = self.get_scoring_metric("mape")
+            mape = MeanAbsolutePercentageError()
             temp["mape"] = mape(test_y, y_pred)
-            mase = self.get_scoring_metric("mase")
-            temp["mase"] = mase(test_y, y_pred)
+            # mase = MeanAbsoluteScaledError()
+            # temp["mase"] = mase(test_y, y_pred)
             if y_pred.name == best_model_id:
                 scoring_metrics.append({"Best_model": temp})
             scoring_metrics.append({y_pred.name: temp})

@@ -1,6 +1,6 @@
 # decision_tree_regressor.py
 
-from scipy.stats.distributions import randint
+from scipy.stats.distributions import loguniform, randint
 
 from automl.models.basemodel import BaseModel, ModelID, ModelType
 from automl.models.ml_model import MLPipelineCCD, MLPipelineSimple
@@ -25,10 +25,12 @@ class DecisionTreeModel(MLPipelineSimple, BaseModel):
                 "friedman_mse",
                 "mae",
             ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__min_impurity_decrease": loguniform(
+                lower=0.000000001, upper=0.5
+            ),
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
-            "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
-            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__min_samples_split": randint(2, 10),
+            "forecaster__reducer__estimator__min_samples_leaf": randint(2, 6),
         }
         return param_grid
 
@@ -62,10 +64,12 @@ class DecisionTreeCCD(MLPipelineCCD, BaseModel):
                 "friedman_mse",
                 "mae",
             ],
-            "forecaster__reducer__estimator__splitter": ["best", "random"],
+            "forecaster__reducer__estimator__min_impurity_decrease": loguniform(
+                lower=0.000000001, upper=0.5
+            ),
             "forecaster__reducer__estimator__max_depth": randint(1, 10),
-            "forecaster__reducer__estimator__min_samples_split": randint(2, 20),
-            "forecaster__reducer__estimator__min_samples_leaf": randint(1, 20),
+            "forecaster__reducer__estimator__min_samples_split": randint(2, 10),
+            "forecaster__reducer__estimator__min_samples_leaf": randint(2, 6),
         }
         return param_grid
 

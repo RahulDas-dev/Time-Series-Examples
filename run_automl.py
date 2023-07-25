@@ -62,7 +62,7 @@ if __name__ == "__main__":
     settings = {
         "model_dir": os.path.abspath("./results"),
         "model_select_count": 1,
-        "cv_split": 5,
+        "cv_split": 2,
         "metric": "mase",
         "filter": {"ModelId": ["LightGBMCCD", "LightGBM"]},
     }

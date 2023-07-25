@@ -45,6 +45,12 @@ class MLPipleline:
             regressor_args["seed"] = 80
         if hasattr(regressor, "verbose"):
             regressor["verbose"] = 0
+        if hasattr(regressor, "thread_count"):
+            regressor_args["thread_count"] = 9
+        if hasattr(regressor, "task_type"):
+            regressor_args["task_type"] = "CPU"
+        if hasattr(regressor, "border_count"):
+            regressor_args["border_count"] = 32
         # logger.info(regressor_args)
         return regressor_args
 

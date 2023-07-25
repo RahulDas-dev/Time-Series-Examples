@@ -22,7 +22,8 @@ class ModelComparator(Base):
             logger.info("Skipping Model Selection ")
             return self.build_empty_result_dir(models_list)
 
-        logger.info(self.get_crossvalidate_spliter())
+        cv_index = self.get_crossvalidate_spliter(len(self.y))
+        logger.info(cv_index)
         results_list = []
         for model in models_list:
             logger.info(f"Evaluateing {type(model).identifier.name} ...")
@@ -30,7 +31,7 @@ class ModelComparator(Base):
                 forecaster=model.forecaster,
                 y=self.y,
                 X=self.x,
-                cv=self.get_crossvalidate_spliter(),
+                cv=cv_index,
                 strategy="update",
                 scoring=self.get_all_scoring_matric(),
                 return_data=False,
